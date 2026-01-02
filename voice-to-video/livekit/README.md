@@ -21,8 +21,13 @@ export LIVEKIT_API_SECRET="..."
 export LIVEKIT_URL="..."
 ```
 
+* Install depdencies:
+```bash
+uv sync
+```
+
 * Start the agent worker:
 
 ```bash
-python examples/avatar_agents/trugen/agent_worker.py dev
+uv run agent_worker.py dev
 ```

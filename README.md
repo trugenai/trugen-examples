@@ -12,6 +12,9 @@ Each example directory includes its own README file with setup and usage instruc
 - [`reactui-agent`](managed-agents/agent-with-reactui): Create an agent using TruGen API and embed an existing TruGen agent inside a React application using an iFrame.
 - [`static-html`](managed-agents/static-html): Interact with an existing TruGen agent using a simple static `index.html` file (no build tools required).
 
+### Video to Video Agents
+- [`livekit-plugin`](voice-to-video/livekit): Give face to your existing Livekit Voice agent with a simple line of code.
+
 ---
 
 ## 📦 What’s Included

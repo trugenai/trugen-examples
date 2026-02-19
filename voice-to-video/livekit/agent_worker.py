@@ -21,7 +21,7 @@ async def entrypoint(ctx: JobContext):
         resume_false_interruption=False,
     )
 
-    avatar_id = os.getenv("TRUGEN_AVATAR_ID") or "45e3f732"
+    avatar_id = os.getenv("TRUGEN_AVATAR_ID") or "c5b563de"
     trugen_avatar = trugen.AvatarSession(avatar_id=avatar_id)
     await trugen_avatar.start(session, room=ctx.room)
 

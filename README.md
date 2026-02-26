@@ -19,7 +19,7 @@ Each example directory includes its own README file with setup and usage instruc
 
 ### Widget Integration
 
-- [`widget-integration`](widget-integration): Embed a TruGen video agent as a widget on any website HTML page with minimal configuration.
+- [`embed-via-widget`](embed-via-widget): Embed a TruGen video agent as a widget on any website HTML page with minimal configuration.
 
 ---
 
@@ -28,7 +28,7 @@ Each example directory includes its own README file with setup and usage instruc
 - iFrame-based agent embedding
 - User and session configuration
 - Conversational context injection
-- Widget integration
+- Embed via widget
 
 ---
 

@@ -17,9 +17,9 @@ Each example directory includes its own README file with setup and usage instruc
 
 - [`livekit-plugin`](voice-to-video/livekit): Give face to your existing Livekit Voice agent with a simple line of code.
 
-### Widget Integration
+### Embed via Widget
 
-- [`embed-via-widget`](embed-via-widget): Embed a TruGen video agent as a widget on any website HTML page with minimal configuration.
+- [`embed-via-widget`](embed_via_widget): Embed a TruGen video agent as a widget on any website HTML page with minimal configuration.
 
 ---
 

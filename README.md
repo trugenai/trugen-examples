@@ -8,6 +8,10 @@ Each example directory includes its own README file with setup and usage instruc
 
 ## 🚀 List of Examples
 
+### SDK
+
+- [`react-agent-ui`](sdk/react-agent-ui): Embed a TruGen agent directly into a React app using the `@trugen/agent-ui` npm package — no iFrame required.
+
 ### Managed Agents
 
 - [`reactui-agent`](managed-agents/agent-with-reactui): Create an agent using TruGen API and embed an existing TruGen agent inside a React application using an iFrame.
@@ -25,6 +29,7 @@ Each example directory includes its own README file with setup and usage instruc
 
 ## 📦 What’s Included
 
+- Native React component integration via `@trugen/agent-ui`
 - iFrame-based agent embedding
 - User and session configuration
 - Conversational context injection

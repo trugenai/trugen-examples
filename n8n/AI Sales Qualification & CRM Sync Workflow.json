@@ -1,0 +1,1512 @@
+{
+  "name": "AI Sales Qualification & CRM Sync Workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## AI Sales Qualification & CRM Sync Workflow\n\nThis workflow automates the **B2B Lead Qualification** process using the BANT framework. It evaluates prospects, calculates lead scores, routes them to the right sales owner, and syncs all data to HubSpot.\n\n### ## How it works\n1. **Intake**: Captures sales discovery calls via the Trugen AI agent.\n2. **Scoring**: Uses **GPT-4o** to extract BANT signals (Budget, Authority, Need, Timeline).\n3. **Routing**: Automatically assigns leads to Senior, Mid, or SDR reps based on score and industry.\n4. **CRM Sync**: Updates HubSpot and logs full qualification details to Google Sheets.\n\n### ## Setup steps\n1. **Initialize**: Click \"Click to Start Setup\" to create your Sales Agent.\n2. **CRM Auth**: Connect your \"HubSpot\" and \"Gmail\" accounts.\n3. **Webhook**: Link the Webhook URL in your Trugen dashboard.\n4. **Sheets**: Connect the Google Sheets node to your tracking spreadsheet.\n\n### ## Requirements\n- OpenAI & Trugen API Keys\n- HubSpot Developer Account / Token\n- Google Workspace (Gmail & Sheets)",
+        "height": 624,
+        "width": 544
+      },
+      "id": "911391e2-63f0-4c92-ad14-7f97e0422f23",
+      "name": "Main Overview Sticky",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1280,
+        864
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## 🟣 Step 3.2 — AI Lead Scoring (BANT)\n\n**Purpose**\nEvaluates the sales conversation using the BANT framework.\n\n**Analyzes**\n- Budget readiness\n- Decision authority\n- Business need / pain severity\n- Purchase timeline urgency\n\n**Outputs**\n- Lead score (0–100)\n- Qualification level\n- Routing and follow-up guidance\n\nScoring is fully rule-based and derived only from the conversation transcript.\n",
+        "height": 636,
+        "width": 472
+      },
+      "id": "93c29873-bc83-4d26-bb6b-aacb2ce36486",
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        3136,
+        1312
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## 🟣 Step 3.4 — Intelligent Lead Routing\n\n**Purpose**\nAutomatically assigns each lead to the right sales owner based on qualification strength, urgency, and industry fit.\n\n**How routing works**\n- Uses the final lead score (0–100) derived from BANT analysis\n- Maps leads to the correct tier:\n  - Hot (75+) → Senior Sales\n  - Warm (50–74) → Mid-Level Sales\n  - Cold (25–49) → SDR\n  - Unqualified (<25) → Marketing Nurture\n\n**Key factors considered**\n- Lead score and qualification tier\n- Industry match with sales rep expertise\n- Current workload and capacity of each rep\n- Budget clarity, decision-maker presence, pain severity, and urgency\n",
+        "height": 684,
+        "width": 612,
+        "color": 2
+      },
+      "id": "869043fd-a265-48a7-bf23-efdc82df9a07",
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        3632,
+        1264
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "jsCode": "// =====================================================\n// Intelligent Lead Routing Engine\n// Score-Based + Industry-Specific Assignment\n// =====================================================\n\n// -----------------------------\n// Sales Team Configuration\n// -----------------------------\nconst salesTeam = {\n  senior: [\n    {\n      name: \"Munakala Bharath\",\n      email: \"br7601225@gmail.com\",\n      industries: [\"Technology\", \"SaaS\", \"Enterprise Software\", \"Cloud Services\", \"Customer Support\"],\n      minLeadScore: 75,\n      tier: \"Hot\",\n      maxActiveLeads: 10,\n      currentLeads: 8,\n      specialization: \"Enterprise SaaS & Cloud Solutions\"\n    },\n    {\n      name: \"Sarah Mitchell\",\n      email: \"sarah.mitchell@company.com\",\n      industries: [\"Fintech\", \"Banking\", \"Financial Services\", \"Insurance\"],\n      minLeadScore: 75,\n      tier: \"Hot\",\n      maxActiveLeads: 10,\n      currentLeads: 6,\n      specialization: \"Financial Technology & Banking\"\n    }\n  ],\n  midLevel: [\n    {\n      name: \"Bharath Reddy\",\n      email: \"bharathmunakala22@gmail.com\",\n      industries: [\"Professional Services\", \"Consulting\", \"Education\", \"Healthcare\"],\n      minLeadScore: 50,\n      tier: \"Warm\",\n      maxActiveLeads: 15,\n      currentLeads: 10,\n      specialization: \"Professional Services & Education\"\n    },\n    {\n      name: \"Michael Chen\",\n      email: \"michael.chen@company.com\",\n      industries: [\"E-commerce\", \"Retail\", \"Business Services\", \"Manufacturing\"],\n      minLeadScore: 50,\n      tier: \"Warm\",\n      maxActiveLeads: 15,\n      currentLeads: 12,\n      specialization: \"E-commerce & Retail Solutions\"\n    },\n    {\n      name: \"Jessica Taylor\",\n      email: \"jessica.taylor@company.com\",\n      industries: [\"Marketing\", \"Advertising\", \"Media\", \"Entertainment\"],\n      minLeadScore: 50,\n      tier: \"Warm\",\n      maxActiveLeads: 15,\n      currentLeads: 9,\n      specialization: \"Marketing & Media Technology\"\n    }\n  ],\n  sdr: [\n    {\n      name: \"Emily Brown\",\n      email: \"emily.brown@company.com\",\n      industries: [\"All\"],\n      minLeadScore: 25,\n      tier: \"Cold\",\n      maxActiveLeads: 30,\n      currentLeads: 25,\n      specialization: \"General Lead Development\"\n    },\n    {\n      name: \"David Rodriguez\",\n      email: \"david.rodriguez@company.com\",\n      industries: [\"All\"],\n      minLeadScore: 25,\n      tier: \"Cold\",\n      maxActiveLeads: 30,\n      currentLeads: 22,\n      specialization: \"Lead Qualification & Nurture\"\n    }\n  ],\n  nurture: [\n    {\n      name: \"Marketing Automation\",\n      email: \"marketing.automation@company.com\",\n      industries: [\"All\"],\n      minLeadScore: 0,\n      tier: \"Unqualified\",\n      maxActiveLeads: 1000,\n      currentLeads: 450,\n      specialization: \"Automated Nurture Campaigns\"\n    }\n  ]\n};\n\n// -----------------------------\n// Extract Data from Previous Node Output\n// -----------------------------\nconst output = $input.first().json.output || {};\n\n// Basic Information\nconst dealName = output.dealName || \"-\";\nconst companyName = output.companyName || \"-\";\nconst contactName = output.contactName || \"-\";\nconst industry = output.industry || \"-\";\nconst currentSolution = output.currentSolution || \"-\";\n\n// BANT Scores - Extract from nested bant object\nconst budgetScore = output.bant?.budget?.score || 0;\nconst budgetAssessment = output.bant?.budget?.assessment || \"-\";\nconst hasBudget = output.bant?.budget?.hasBudget === \"Yes\" || output.bant?.budget?.hasBudget === true;\n\nconst authorityScore = output.bant?.authority?.score || 0;\nconst authorityAssessment = output.bant?.authority?.assessment || \"-\";\nconst decisionMaker = output.bant?.authority?.decisionMaker || output.decisionMaker || \"-\";\nconst isDecisionMaker = decisionMaker !== \"-\" && decisionMaker !== \"\";\n\nconst needScore = output.bant?.need?.score || 0;\nconst needAssessment = output.bant?.need?.assessment || \"-\";\nconst painSeverity = output.bant?.need?.painSeverity || \"low\";\n\nconst timelineScore = output.bant?.timeline?.score || 0;\nconst timelineAssessment = output.bant?.timeline?.assessment || \"-\";\nconst timeline = output.bant?.timeline?.timeline || \"-\";\nconst urgency = output.bant?.timeline?.urgency || \"low\";\n\n// Calculate Lead Score from BANT components\nconst bantScores = [budgetScore, authorityScore, needScore, timelineScore].filter(s => s > 0);\nconst averageBantScore = bantScores.length > 0 \n  ? bantScores.reduce((a, b) => a + b, 0) / bantScores.length \n  : 0;\n\n// Convert to 0-100 scale\nconst calculatedLeadScore = Math.round(averageBantScore * 10);\n\n// Use provided leadScore or calculated\nconst finalLeadScore = output.leadScore || calculatedLeadScore;\n\n// Other Important Fields\nconst keyInsights = Array.isArray(output.keyInsights) ? output.keyInsights : [];\nconst redFlagsInput = Array.isArray(output.redFlags) ? output.redFlags : [];\nconst opportunitySize = output.opportunitySize || \"-\";\nconst competitorVulnerability = output.competitorVulnerability || \"-\";\nconst recommendedAction = output.recommendedAction || \"-\";\nconst idealSalesRep = output.idealSalesRep || \"-\";\nconst conversionProbability = output.conversionProbability || \"0%\";\nconst nextStepsInput = Array.isArray(output.nextSteps) ? output.nextSteps : [];\nconst talkingPoints = Array.isArray(output.talkingPoints) ? output.talkingPoints : [];\nconst estimatedDealValue = output.estimatedDealValue || \"-\";\nconst momInput = output.mom || null;\nconst painPoints = output.painPoints || needAssessment || \"-\";\n\n// -----------------------------\n// Qualification Tier Determination\n// -----------------------------\nlet qualificationTier = \"Unqualified\";\nlet repLevelCategory = \"nurture\";\n\n// Score-based routing\nif (finalLeadScore >= 75) {\n  qualificationTier = \"Hot\";\n  repLevelCategory = \"senior\";\n} else if (finalLeadScore >= 50 && finalLeadScore < 75) {\n  qualificationTier = \"Warm\";\n  repLevelCategory = \"midLevel\";\n} else if (finalLeadScore >= 25 && finalLeadScore < 50) {\n  qualificationTier = \"Cold\";\n  repLevelCategory = \"sdr\";\n} else {\n  qualificationTier = \"Unqualified\";\n  repLevelCategory = \"nurture\";\n}\n\n// Override with provided qualificationTier\nif (output.qualificationTier) {\n  const tier = output.qualificationTier.toString().toLowerCase();\n  if (tier === \"hot\" || tier === \"a\") {\n    qualificationTier = \"Hot\";\n    repLevelCategory = \"senior\";\n  } else if (tier === \"warm\" || tier === \"b\") {\n    qualificationTier = \"Warm\";\n    repLevelCategory = \"midLevel\";\n  } else if (tier === \"cold\" || tier === \"c\") {\n    qualificationTier = \"Cold\";\n    repLevelCategory = \"sdr\";\n  }\n}\n\n// Escalate based on BANT signals\nif (budgetScore >= 9 && authorityScore >= 9 && needScore >= 8 && timelineScore >= 8) {\n  qualificationTier = \"Hot\";\n  repLevelCategory = \"senior\";\n}\n\n// -----------------------------\n// Priority Assignment\n// -----------------------------\nlet priority = \"Low\";\n\nif (finalLeadScore >= 75 || qualificationTier === \"Hot\") {\n  priority = \"High\";\n} else if (finalLeadScore >= 50 || qualificationTier === \"Warm\") {\n  priority = \"Medium\";\n} else if (finalLeadScore >= 25 || qualificationTier === \"Cold\") {\n  priority = \"Low\";\n} else {\n  priority = \"Nurture\";\n}\n\n// Escalate based on urgency\nif (urgency === \"High\" || urgency === \"immediate\") {\n  if (priority === \"Medium\") priority = \"High\";\n  if (priority === \"Low\") priority = \"Medium\";\n}\n\n// Escalate if decision maker confirmed\nif (isDecisionMaker && priority === \"Low\" && finalLeadScore >= 25) {\n  priority = \"Medium\";\n}\n\n// Escalate if pain severity is high\nif (painSeverity === \"High\") {\n  if (priority === \"Low\") priority = \"Medium\";\n  if (priority === \"Medium\" && urgency === \"High\") priority = \"High\";\n}\n\n// -----------------------------\n// Persona Classification\n// -----------------------------\nlet persona = \"Influencer\";\n\nif (isDecisionMaker) {\n  persona = \"Economic Buyer\";\n} else if (authorityScore >= 7) {\n  persona = \"Champion\";\n}\n\n// -----------------------------\n// Industry-Based Rep Matching\n// -----------------------------\nfunction findBestRep(repLevel, industry) {\n  let eligibleReps = salesTeam[repLevel];\n  \n  // Priority 1: Industry match with available capacity\n  let industryMatchReps = eligibleReps.filter(rep => \n    rep.currentLeads < rep.maxActiveLeads &&\n    (rep.industries.includes(industry) || rep.industries.includes(\"All\"))\n  );\n  \n  if (industryMatchReps.length > 0) {\n    return industryMatchReps.reduce((prev, current) => \n      prev.currentLeads < current.currentLeads ? prev : current\n    );\n  }\n  \n  // Priority 2: Any rep with capacity\n  let availableReps = eligibleReps.filter(rep => \n    rep.currentLeads < rep.maxActiveLeads\n  );\n  \n  if (availableReps.length > 0) {\n    return availableReps.reduce((prev, current) => \n      prev.currentLeads < current.currentLeads ? prev : current\n    );\n  }\n  \n  // Priority 3: Least loaded rep\n  return eligibleReps.reduce((prev, current) => \n    prev.currentLeads < current.currentLeads ? prev : current\n  );\n}\n\nconst assignedRep = findBestRep(repLevelCategory, industry);\n\n// -----------------------------\n// Enhanced Deal Name\n// -----------------------------\nconst enhancedDealName = dealName !== \"-\" \n  ? dealName\n  : companyName !== \"-\" \n    ? `${companyName} – ${qualificationTier} Lead`\n    : `${qualificationTier} Lead – ${contactName}`;\n\n// -----------------------------\n// Red Flags Analysis\n// -----------------------------\nconst redFlags = [...redFlagsInput];\n\nif (!isDecisionMaker) {\n  redFlags.push(\"Decision-making authority not confirmed\");\n}\n\nif (!hasBudget) {\n  redFlags.push(\"Budget not clearly defined or confirmed\");\n}\n\nif (urgency !== \"High\" && urgency !== \"immediate\") {\n  redFlags.push(\"Urgency level is not high\");\n}\n\nif (industry === \"-\") {\n  redFlags.push(\"Industry not identified\");\n}\n\nif (currentSolution === \"-\") {\n  redFlags.push(\"Current solution not documented\");\n}\n\n// -----------------------------\n// Sales Call Recommendation\n// -----------------------------\nconst salesCall = {\n  recommended: qualificationTier === \"Hot\" || qualificationTier === \"Warm\",\n  priority: priority,\n  reason: qualificationTier === \"Hot\" \n    ? \"High-priority lead with strong BANT qualification signals\"\n    : qualificationTier === \"Warm\"\n    ? \"Moderate qualification - schedule discovery call\"\n    : qualificationTier === \"Cold\"\n    ? \"Initial qualification call recommended\"\n    : \"Lead requires nurturing before sales engagement\",\n  suggestedTimeframe: urgency === \"High\" || urgency === \"immediate\"\n    ? \"Within 24 hours\"\n    : urgency === \"Medium\"\n    ? \"Within 3-5 business days\"\n    : timeline.includes(\"weeks\")\n    ? \"Within 1 week\"\n    : \"Within 1-2 weeks\"\n};\n\n// -----------------------------\n// Meeting Notes (MOM)\n// -----------------------------\nconst mom = momInput || {\n  summary: `${qualificationTier} lead with ${isDecisionMaker ? 'confirmed' : 'unconfirmed'} decision maker: ${contactName}`,\n  painPoints: painPoints !== \"-\" ? painPoints : needAssessment,\n  budgetStatus: budgetAssessment,\n  timeline: timelineAssessment,\n  authority: isDecisionMaker ? `Confirmed - ${contactName}` : \"Not confirmed\",\n  currentSolution: currentSolution,\n  keyInsights: keyInsights,\n  urgency: urgency,\n  painSeverity: painSeverity\n};\n\n// -----------------------------\n// Next Steps\n// -----------------------------\nconst nextSteps = nextStepsInput.length > 0 \n  ? nextStepsInput \n  : [\n      qualificationTier === \"Hot\" \n        ? \"Schedule product demo within 24-48 hours\"\n        : qualificationTier === \"Warm\"\n        ? \"Conduct discovery call within 3-5 days\"\n        : qualificationTier === \"Cold\"\n        ? \"Initial qualification and needs assessment\"\n        : \"Enroll in automated nurture campaign\"\n    ];\n\n// -----------------------------\n// Feedback\n// -----------------------------\nconst feedback = recommendedAction !== \"-\"\n  ? recommendedAction\n  : qualificationTier === \"Hot\"\n  ? `IMMEDIATE ACTION REQUIRED: High-priority ${persona} with ${urgency} urgency. All BANT criteria met.`\n  : qualificationTier === \"Warm\"\n  ? `Action within 3-5 days: ${persona} showing interest with ${urgency} urgency.`\n  : qualificationTier === \"Cold\"\n  ? \"Focus on relationship building and pain point discovery\"\n  : \"Enroll in nurture sequence until qualification improves\";\n\n// -----------------------------\n// Routing Decision Metadata\n// -----------------------------\nconst routingDecision = {\n  routedTo: assignedRep.name,\n  routedToEmail: assignedRep.email,\n  routedLevel: repLevelCategory.toUpperCase(),\n  routingReason: `Lead Score: ${finalLeadScore}/100 (${qualificationTier}) | Industry: ${industry} | Urgency: ${urgency} | Decision Maker: ${isDecisionMaker ? 'Yes' : 'No'}`,\n  industry: industry,\n  urgency: urgency,\n  decisionMaker: isDecisionMaker,\n  decisionMakerName: decisionMaker,\n  hasBudget: hasBudget,\n  painSeverity: painSeverity,\n  routedAt: new Date().toISOString(),\n  routingScore: finalLeadScore\n};\n\n// -----------------------------\n// BANT Summary\n// -----------------------------\nconst bantSummary = {\n  overallScore: finalLeadScore,\n  scoreBreakdown: {\n    budget: budgetScore,\n    authority: authorityScore,\n    need: needScore,\n    timeline: timelineScore\n  },\n  budget: {\n    score: budgetScore,\n    assessment: budgetAssessment,\n    hasBudget: hasBudget,\n    estimatedValue: estimatedDealValue\n  },\n  authority: {\n    score: authorityScore,\n    assessment: authorityAssessment,\n    decisionMaker: decisionMaker,\n    isConfirmed: isDecisionMaker\n  },\n  need: {\n    score: needScore,\n    assessment: needAssessment,\n    painSeverity: painSeverity,\n    painPoints: painPoints\n  },\n  timeline: {\n    score: timelineScore,\n    assessment: timelineAssessment,\n    timeline: timeline,\n    urgency: urgency\n  }\n};\n\n// -----------------------------\n// Final Output\n// -----------------------------\nreturn {\n  json: {\n    // Lead Identification\n    dealName: enhancedDealName,\n    companyName,\n    contactName,\n    industry,\n    \n    // Scoring & Qualification\n    leadScore: finalLeadScore,\n    qualificationTier,\n    priority,\n    persona,\n    conversionProbability,\n    estimatedDealValue,\n    \n    // BANT Analysis\n    bantSummary,\n    \n    // Routing Assignment\n    assignedRep: {\n      name: assignedRep.name,\n      email: assignedRep.email,\n      level: repLevelCategory,\n      tier: assignedRep.tier,\n      specialization: assignedRep.specialization,\n      currentLeadLoad: assignedRep.currentLeads,\n      maxCapacity: assignedRep.maxActiveLeads,\n      loadPercentage: Math.round((assignedRep.currentLeads / assignedRep.maxActiveLeads) * 100) + \"%\",\n      industries: assignedRep.industries\n    },\n    \n    // Intelligence & Analysis\n    redFlags,\n    keyInsights,\n    opportunitySize,\n    competitorVulnerability,\n    idealSalesRep,\n    currentSolution,\n    \n    // Action Items\n    salesCall,\n    nextSteps,\n    talkingPoints,\n    feedback,\n    mom,\n    \n    // Metadata\n    routingDecision,\n    \n    // Original Data Reference\n    sourceData: {\n      dealName: output.dealName,\n      companyName: output.companyName,\n      industry: output.industry\n    }\n  }\n};"
+      },
+      "id": "b04ad95b-a352-447d-ad68-bc58ce0b71aa",
+      "name": "Intelligent Routing Logic",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        3968,
+        1776
+      ],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "content": "## 🟣 Step 3.3 — HubSpot CRM Sync\n\n**Purpose**: Push qualified leads to HubSpot  \n**Outcome**: Centralized CRM record for sales follow-up\n",
+        "height": 344,
+        "width": 416,
+        "color": 4
+      },
+      "id": "ae0d66df-e174-4d51-8392-30ab085f3983",
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        4384,
+        1264
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## 🟣 Step 3.5 — Rep Notification\n\n**Purpose**\nNotifies the assigned sales rep immediately when a new lead is routed.\n\n**What it does**\n- Sends an automated HTML email to the assigned rep\n- Shares essential lead details (contact, company, budget)\n- Includes BANT score summary for quick context\n- Highlights key insights and recommended next steps\n",
+        "height": 508,
+        "width": 420,
+        "color": 6
+      },
+      "id": "48f45ab0-7505-4d00-aac6-d40aa8c8b008",
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        4912,
+        1184
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.assignedRep.email }}",
+        "subject": "=🔥 {{ $json.qualificationTier }} Lead Assigned: {{ $('Set Fields').item.json.choices[0].message.content.companyName }} (Score: {{ $json.leadScore }})",
+        "message": "=<div style=\"font-family: Arial, sans-serif; max-width: 700px; margin: 0 auto; border: 1px solid #e0e0e0; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.1);\">\n\n  <!-- Header -->\n  <div style=\"background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center;\">\n    <h1 style=\"margin: 0;\">🎯 New {{ $json.qualificationTier }} Lead Assigned</h1>\n    <p style=\"margin: 10px 0 0 0;\">\n      Lead Score: <strong>{{ $json.leadScore }}/100</strong>\n    </p>\n  </div>\n\n  <!-- Lead Information -->\n  <div style=\"background-color: #f8f9fa; padding: 25px;\">\n    <h2>Lead Information</h2>\n    <p><strong>Contact:</strong> {{ $json.contactName }}</p>\n    <p><strong>Company:</strong> {{ $json.companyName }}</p>\n    <p><strong>Email:</strong> {{ $('Edit Fields').item.json.output.email }}</p>\n    <p><strong>Phone:</strong> {{ $('Edit Fields').item.json.output.phone }}</p>\n    <p><strong>Budget:</strong> {{ $json.bantSummary.budget.estimatedValue }}</p>\n  </div>\n\n  <!-- BANT Breakdown -->\n  <div style=\"background-color: #ffffff; padding: 25px;\">\n    <h2>BANT Breakdown</h2>\n    <p><strong>Budget:</strong> {{ $json.bantSummary.budget.score }}/10</p>\n    <p><strong>Authority:</strong> {{ $json.bantSummary.authority.score }}/10</p>\n    <p><strong>Need:</strong> {{ $json.bantSummary.need.score }}/10</p>\n    <p><strong>Timeline:</strong> {{ $json.bantSummary.timeline.score }}/10</p>\n  </div>\n\n  <!-- Key Insights -->\n  <div style=\"background-color: #fff3cd; padding: 20px; border-radius: 5px;\">\n    <h3>Key Insights</h3>\n    <ul style=\"margin: 10px 0; padding-left: 20px;\">\n      {{\n        ($json.keyInsights || []).map(item => `<li>${item}</li>`).join('')\n      }}\n    </ul>\n  </div>\n\n  <!-- Next Steps -->\n  <div style=\"background-color: #d4edda; padding: 20px; border-radius: 5px;\">\n    <h3>Next Steps</h3>\n    <ol style=\"margin: 10px 0; padding-left: 20px;\">\n      {{\n        ($json.nextSteps || []).map(step => `<li>${step}</li>`).join('')\n      }}\n    </ol>\n  </div>\n\n  <!-- Footer -->\n  <div style=\"background-color: #667eea; color: white; padding: 20px 30px; text-align: center;\">\n    <p style=\"margin: 0; font-size: 14px;\">© 2026 {{ $json.companyName }}. All rights reserved.</p>\n  </div>\n\n</div>",
+        "options": {}
+      },
+      "id": "5fa4dc43-6d46-4d28-8838-7fc41aa6f67c",
+      "name": "Notify Sales Rep",
+      "type": "n8n-nodes-base.gmail",
+      "position": [
+        5072,
+        1520
+      ],
+      "webhookId": "996cc104-f473-4071-bf4f-671bf6273036",
+      "typeVersion": 2.1,
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "B8sbxjv6j1aGnjyx",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## 🟣 Step 3.6 — Lead Confirmation\n\n**Purpose**\nSends an automatic response to the prospect confirming their inquiry.\n\n**What it does**\n- Delivers a branded HTML email via Gmail  \n- Acknowledges the submission  \n- Sets expectations for next steps  \n",
+        "height": 472,
+        "width": 432,
+        "color": 6
+      },
+      "id": "bcc9e161-7b76-4de1-8e4a-84f130d4c23b",
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        4512,
+        2096
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Edit Fields').item.json.output.email }}",
+        "subject": "=Thank You for Your Interest!",
+        "message": "=<div style=\"font-family: 'Arial', sans-serif; max-width: 650px; margin: 0 auto; border: 1px solid #e0e0e0; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.1);\">\n  \n  <!-- Header -->\n  <div style=\"background-color: #667eea; color: white; padding: 40px 30px; text-align: center;\">\n    <h1 style=\"margin: 0; font-size: 28px;\">Thank You!</h1>\n    <p style=\"margin: 5px 0 0; font-size: 16px;\">We've received your inquiry and analyzed your lead details</p>\n  </div>\n\n  <!-- Lead Summary -->\n  <div style=\"background-color: #fff; padding: 30px;\">\n    <p style=\"font-size: 16px;\">Hi <strong>{{ $('Set Fields').item.json.choices[0].message.content.contactName }}</strong>,</p>\n    <p style=\"font-size: 16px;\">Thank you for your interest in <strong>{{ $json.sourceData.dealName }}</strong> at <strong>{{ $json.sourceData.companyName }}</strong>. Our team has reviewed your details and we’re excited to assist you further.</p>\n    \n    <!-- Deal & Lead Info -->\n    <div style=\"background-color: #f5f5f5; padding: 20px; margin: 20px 0; border-radius: 8px;\">\n      <h3 style=\"margin-top: 0; color: #333;\">Lead Summary</h3>\n      <p><strong>Deal Name:</strong> {{ $json.sourceData.dealName }}</p>\n      <p><strong>Company:</strong> {{ $json.sourceData.companyName }}</p>\n      <p><strong>Industry:</strong> {{ $json.sourceData.industry }}</p>\n      <p><strong>Decision Maker:</strong> {{ $json.routingDecision.decisionMakerName }}</p>\n      <p><strong>Lead Score:</strong> {{ $json.leadScore }}</p>\n      <p><strong>Urgency:</strong> {{ $json.bantSummary.timeline.urgency }}</p>\n      <p><strong>Budget Status:</strong> {{ $json.bantSummary.budget.estimatedValue }}</p>\n    </div>\n\n    <!-- Pain Points -->\n    <div style=\"background-color: #ffe6e6; padding: 20px; margin: 20px 0; border-left: 5px solid #ff4d4f; border-radius: 5px;\">\n      <h3 style=\"margin-top: 0; color: #c00;\">Pain Points</h3>\n      <p>{{ $json.mom.painPoints }}</p>\n    </div>\n\n    <!-- Key Insights -->\n    <div style=\"background-color: #e7f3ff; padding: 20px; margin: 20px 0; border-radius: 8px;\">\n      <h3 style=\"margin-top: 0; color: #1a73e8;\">Key Insights</h3>\n      <ul style=\"margin: 10px 0; padding-left: 20px;\">\n        <li>{{ $json.keyInsights[0] }}</li>\n        <li>{{ $json.keyInsights[1] }}</li>\n        <li>{{ $json.keyInsights[2] }}</li>\n        <li>{{ $json.keyInsights[3] }}</li>\n      </ul>\n    </div>\n\n    <!-- Routing Info -->\n    <div style=\"background-color: #fff3e0; padding: 20px; margin: 20px 0; border-left: 5px solid #ff9800; border-radius: 5px;\">\n      <h3 style=\"margin-top: 0; color: #e65100;\">Routing Details</h3>\n      <p><strong>Routed To:</strong> {{ $json.routingDecision.routedTo }} ({{ $json.routingDecision.routedLevel }})</p>\n      <p><strong>Email:</strong> {{ $json.routingDecision.routedToEmail }}</p>\n      <p><strong>Reason:</strong> {{ $json.routingDecision.routingReason }}</p>\n    </div>\n\n    <!-- Closing Note -->\n    <p style=\"font-size: 16px;\">Our dedicated account executive will reach out to you shortly to discuss the next steps and assist with your implementation.</p>\n\n    <!-- Account Executive Card -->\n    <div style=\"background-color: #e7f3ff; padding: 20px; margin: 25px 0; border-radius: 8px;\">\n      <h3 style=\"margin-top: 0; color: #1a73e8;\">Your Account Executive</h3>\n      <p><strong>{{ $json.routingDecision.routedTo }}</strong></p>\n      <p>Email: {{ $json.routingDecision.routedToEmail }}</p>\n    </div>\n\n    <p style=\"font-size: 16px;\">We look forward to speaking with you soon!</p>\n  </div>\n\n  <!-- Footer -->\n  <div style=\"background-color: #667eea; color: white; padding: 20px 30px; text-align: center;\">\n    <p style=\"margin: 0; font-size: 14px;\">© 2026 {{ $json.sourceData.companyName }}. All rights reserved.</p>\n  </div>\n</div>\n",
+        "options": {}
+      },
+      "id": "d4e419e6-c2e0-47d4-8a22-87656a063ad2",
+      "name": "Send Lead Confirmation",
+      "type": "n8n-nodes-base.gmail",
+      "position": [
+        4672,
+        2400
+      ],
+      "webhookId": "6744212d-d0e8-4b6d-80c4-9c0ebd30e4f3",
+      "typeVersion": 2.1,
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "B8sbxjv6j1aGnjyx",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## 🟣 Step 3.7 — Analytics Tracking\n\n**Purpose**\nStores the complete sales qualification output for reporting and analysis.\n\n**What it does**\n- Logs AI scoring, BANT breakdown, and routing decision\n- Captures key insights, red flags, and MOM summary\n- Adds timestamps for tracking and follow-ups\n",
+        "height": 492,
+        "width": 468,
+        "color": 7
+      },
+      "id": "088b14fa-4602-4bca-ab52-26c4ddd76cb8",
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        5056,
+        1776
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1rAKmFD54NKH710I_hVlv532tr0hbBNrkfejyGVuGeWU",
+          "mode": "list",
+          "cachedResultName": "SALES QUALIFICATION",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1rAKmFD54NKH710I_hVlv532tr0hbBNrkfejyGVuGeWU/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Qualification details",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1rAKmFD54NKH710I_hVlv532tr0hbBNrkfejyGVuGeWU/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "DEALNAME": "={{ $json.dealName }}",
+            "COMPANYNAME": "={{ $json.companyName }}",
+            "CONTACTNAME": "={{ $json.contactName }}",
+            "INDUSTRY": "={{ $json.industry }}",
+            "LEADSCORE": "={{ $json.leadScore }}",
+            "QUALIFICATIONTIER": "={{ $json.qualificationTier }}",
+            "PRIORITY": "={{ $json.priority }}",
+            "PERSONA": "={{ $json.persona }}",
+            "CONVERSIONPROBABILITY": "={{ $json.conversionProbability }}",
+            "ESTIMATEDDEALVALUE": "={{ $json.estimatedDealValue }}",
+            "BANTSUMMARY": "={{\n`Overall Score: ${$json.bantSummary.overallScore}\n\nBudget Score: ${$json.bantSummary.budget.score}\nBudget Assessment: ${$json.bantSummary.budget.assessment}\nHas Budget: ${$json.bantSummary.budget.hasBudget}\nEstimated Value: ${$json.bantSummary.budget.estimatedValue}\n\nAuthority Score: ${$json.bantSummary.authority.score}\nAuthority Assessment: ${$json.bantSummary.authority.assessment}\nDecision Maker: ${$json.bantSummary.authority.decisionMaker}\n\nNeed Score: ${$json.bantSummary.need.score}\nNeed Assessment: ${$json.bantSummary.need.assessment}\nPain Severity: ${$json.bantSummary.need.painSeverity}\nPain Points: ${$json.bantSummary.need.painPoints}\n\nTimeline Score: ${$json.bantSummary.timeline.score}\nTimeline Assessment: ${$json.bantSummary.timeline.assessment}\nUrgency: ${$json.bantSummary.timeline.urgency}`\n}}\n",
+            "ASSIGNEDREP": "={{\n`Assigned Rep Name: ${$json.assignedRep.name}\nEmail: ${$json.assignedRep.email}\nLevel: ${$json.assignedRep.level}\nTier: ${$json.assignedRep.tier}\nSpecialization: ${$json.assignedRep.specialization}\n\nCurrent Lead Load: ${$json.assignedRep.currentLeadLoad}\nMax Capacity: ${$json.assignedRep.maxCapacity}\nLoad Percentage: ${$json.assignedRep.loadPercentage}\n\nIndustries: ${($json.assignedRep.industries || []).join(', ')}`\n}}\n",
+            "REDFLAGS": "={{ ($json.redFlags || []).join(', ') || 'None' }}",
+            "KEYINSIGHTS": "={{\n($json.keyInsights && $json.keyInsights.length)\n  ? $json.keyInsights.map((v, i) => `${i + 1}. ${v}`).join('\\n')\n  : 'None'\n}}\n",
+            "OPPORTUNITYSIZE": "={{ $json.opportunitySize }}",
+            "COMPETITORVULNERABILITY": "={{ $json.competitorVulnerability }}",
+            "IDEALSALESREP": "={{ $json.idealSalesRep }}",
+            "CURRENTSOLUTION": "={{ $json.currentSolution }}",
+            "SALESCALL": "={{\n$json.salesCall\n  ? [\n      `Recommended: ${$json.salesCall.recommended}`,\n      `Priority: ${$json.salesCall.priority}`,\n      `Reason: ${$json.salesCall.reason}`,\n      `Suggested Timeframe: ${$json.salesCall.suggestedTimeframe}`\n    ].join('\\n')\n  : 'None'\n}}\n",
+            "NEXTSTEPS": "={{\n($json.nextSteps && $json.nextSteps.length)\n  ? $json.nextSteps.map((v, i) => `${i + 1}. ${v}`).join('\\n')\n  : 'None'\n}}\n",
+            "TALKINGPOINTS": "={{\n($json.talkingPoints && $json.talkingPoints.length)\n  ? $json.talkingPoints.map((v, i) => `${i + 1}. ${v}`).join('\\n')\n  : 'None'\n}}\n",
+            "FEEDBACK": "={{ $json.feedback }}",
+            "MOM": "={{\n$json.mom\n  ? [\n      `Summary: ${$json.mom.summary}`,\n      `Pain Points: ${$json.mom.painPoints}`,\n      `Budget Status: ${$json.mom.budgetStatus}`,\n      `Timeline: ${$json.mom.timeline}`,\n      `Authority: ${$json.mom.authority}`,\n      `Current Solution: ${$json.mom.currentSolution}`,\n      `Urgency: ${$json.mom.urgency}`,\n      `Pain Severity: ${$json.mom.painSeverity}`,\n      `Key Insights:`,\n      ...(Array.isArray($json.mom.keyInsights)\n        ? $json.mom.keyInsights.map((v, i) => `  ${i + 1}. ${v}`)\n        : [])\n    ].join('\\n')\n  : 'None'\n}}\n",
+            "SOURCEDATA": "={{\n$json.sourceData\n  ? [\n      `Deal Name: ${$json.sourceData.dealName}`,\n      `Company Name: ${$json.sourceData.companyName}`,\n      `Industry: ${$json.sourceData.industry}`\n    ].join('\\n')\n  : 'None'\n}}\n",
+            "ROUTINGDECISION": "={{\n$json.routingDecision\n  ? [\n      `Routed To: ${$json.routingDecision.routedTo}`,\n      `Routed Email: ${$json.routingDecision.routedToEmail}`,\n      `Routed Level: ${$json.routingDecision.routedLevel}`,\n      `Routing Reason: ${$json.routingDecision.routingReason}`,\n      `Industry: ${$json.routingDecision.industry}`,\n      `Urgency: ${$json.routingDecision.urgency}`,\n      `Decision Maker Confirmed: ${$json.routingDecision.decisionMaker}`,\n      `Decision Maker Name: ${$json.routingDecision.decisionMakerName}`,\n      `Has Budget: ${$json.routingDecision.hasBudget}`,\n      `Pain Severity: ${$json.routingDecision.painSeverity}`,\n      `Routing Score: ${$json.routingDecision.routingScore}`,\n      `Routed At: ${$json.routingDecision.routedAt}`\n    ].join('\\n')\n  : 'None'\n}}\n",
+            "Agent ID": "={{ $('Get conversation details').item.json.agent_id }}"
+          },
+          "matchingColumns": [
+            "Agent ID"
+          ],
+          "schema": [
+            {
+              "id": "DEALNAME",
+              "displayName": "DEALNAME",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "COMPANYNAME",
+              "displayName": "COMPANYNAME",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "CONTACTNAME",
+              "displayName": "CONTACTNAME",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "INDUSTRY",
+              "displayName": "INDUSTRY",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "LEADSCORE",
+              "displayName": "LEADSCORE",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "QUALIFICATIONTIER",
+              "displayName": "QUALIFICATIONTIER",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "PRIORITY",
+              "displayName": "PRIORITY",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "PERSONA",
+              "displayName": "PERSONA",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "CONVERSIONPROBABILITY",
+              "displayName": "CONVERSIONPROBABILITY",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "ESTIMATEDDEALVALUE",
+              "displayName": "ESTIMATEDDEALVALUE",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "BANTSUMMARY",
+              "displayName": "BANTSUMMARY",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "ASSIGNEDREP",
+              "displayName": "ASSIGNEDREP",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "REDFLAGS",
+              "displayName": "REDFLAGS",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "KEYINSIGHTS",
+              "displayName": "KEYINSIGHTS",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "OPPORTUNITYSIZE",
+              "displayName": "OPPORTUNITYSIZE",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "COMPETITORVULNERABILITY",
+              "displayName": "COMPETITORVULNERABILITY",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "IDEALSALESREP",
+              "displayName": "IDEALSALESREP",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "CURRENTSOLUTION",
+              "displayName": "CURRENTSOLUTION",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "SALESCALL",
+              "displayName": "SALESCALL",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "NEXTSTEPS",
+              "displayName": "NEXTSTEPS",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "TALKINGPOINTS",
+              "displayName": "TALKINGPOINTS",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "FEEDBACK",
+              "displayName": "FEEDBACK",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "MOM",
+              "displayName": "MOM",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "ROUTINGDECISION",
+              "displayName": "ROUTINGDECISION",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "SOURCEDATA",
+              "displayName": "SOURCEDATA",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Agent ID",
+              "displayName": "Agent ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "9214e17a-f687-44e3-a613-d9fedeb7b306",
+      "name": "Log to Tracking Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "position": [
+        5232,
+        2080
+      ],
+      "typeVersion": 4.4,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Ou6ciRrfN3tE5MZc",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "id": "ab2cd676-fe7f-43ab-8c76-a1445b6c903a",
+      "name": "▶️ Click to Start Setup",
+      "type": "n8n-nodes-base.manualTrigger",
+      "position": [
+        2048,
+        912
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "7865fb06-18cf-4a2e-93a7-45e86c7ccada",
+              "name": "avatarId",
+              "type": "string",
+              "value": "60a0926a"
+            },
+            {
+              "id": "b1dce28c-eea1-42bb-9d51-39462d7cea1a",
+              "name": "agentName",
+              "type": "string",
+              "value": "=Lead Qualification Agent"
+            },
+            {
+              "id": "46f927ce-40b6-4121-b956-e8ee9b0481b1",
+              "name": "welcomeMessage",
+              "type": "string",
+              "value": "Hi there, thanks for reaching out. I’ll ask a few short questions to understand your requirements and see how we can help. It won’t take long. Shall we begin?"
+            },
+            {
+              "id": "b5fcf2ac-705d-49c9-84c9-287b20e8b4cb",
+              "name": "systemPrompt",
+              "type": "string",
+              "value": "=You are a professional Sales Qualification Agent.\n\n{{ $json.agentDescription }}\n\nYour primary objective is to understand the prospect’s business context,\ncurrent state, and readiness by collecting accurate information in a\nstructured, professional, and trustworthy manner.\n\n==================================================\nSCOPE OF SALES QUALIFICATION\n==================================================\nYou are responsible for collecting, step by step, ONLY the following\ninformation directly from the prospect:\n\n• Company & Contact Details:\n  - Company name\n  - Contact name\n  - Email address\n  - Phone number\n\n• Company Profile & Persona:\n  - Company size\n  - Industry\n  - Prospect’s role / persona\n  - Decision authority or involvement\n\n• Current State & Needs:\n  - Current solution or process in use\n  - Key pain points or challenges\n\n• Budget & Timeline:\n  - Budget range (if available)\n  - Expected timeline or urgency\n\nIMPORTANT:\n- Do NOT ask questions related to priority, deal name, deal value,\n  deal probability, sales call type, feedback, meeting notes, MOM,\n  profile analysis, or qualification signals.\n- These elements will be derived later through internal AI analysis\n  and must NOT be explicitly requested from the prospect.\n\n==================================================\nCONVERSATION RULES (STRICT)\n==================================================\n- Start with a clear, confident greeting and confirm the prospect is ready.\n- Ask ONLY ONE question at a time.\n- Proceed to the next question ONLY after receiving a response.\n- Do NOT skip any required field listed in the scope.\n- Do NOT assume, infer, or autofill any information.\n- If an answer is unclear or incomplete, politely ask a follow-up question.\n- If the prospect does not know an answer, record it as \"-\".\n- Briefly acknowledge each response before continuing.\n- Rephrase questions naturally when needed.\n- Maintain a professional, calm, friendly, and consultative tone.\n- Do NOT pitch, demo, negotiate, or discuss pricing at any point.\n\n==================================================\nCLOSING BEHAVIOR\n==================================================\nOnce all required information has been collected:\n- Briefly confirm the captured details.\n- Thank the prospect for their time.\n- Inform them that the information will be reviewed internally.\n- Communicate that next steps will follow.\n- End the conversation politely and professionally.\n"
+            },
+            {
+              "id": "0bd40bb8-1f1a-4a54-9aaf-bedced6a4778",
+              "name": "agentDescription",
+              "value": "={{ $json.agentDescription }}",
+              "type": "string"
+            },
+            {
+              "id": "96f028ec-27e5-437a-8c51-f68f821cec87",
+              "name": "timestamp",
+              "value": "={{ $json.timestamp }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "5fc74790-4770-438f-8cbf-c2362686ee6c",
+      "name": "Prepare Interview Agent",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        2624,
+        912
+      ],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "jsCode": "// Access global workflow static data\nconst workflowStaticData = $getWorkflowStaticData('global');\n\n// Data from \"Create Agent\" response\nconst agentId = $input.first().json.id;\nconst callLink = $input.first().json.call_link;\n\n// Data from \"Prepare Interview Agent\" (Sales Qualification Agent)\nconst prepareNode = $('Prepare Interview Agent').first().json;\n\n// Static / configured values\nconst email = \"bharathmunakala22@gmail.com\";\n\n// Build embed iframe code dynamically\nconst embed_code = `<iframe\n  src=\"https://app.trugen.ai/embed?agentId=${agentId}\"\n  width=\"100%\"\n  height=\"600\"\n  frameborder=\"0\"\n  allow=\"camera; microphone; autoplay\"\n></iframe>`;\n\n// Persist values globally\nworkflowStaticData.agentId = agentId;\nworkflowStaticData.agentName = prepareNode.agentName;\nworkflowStaticData.callLink = callLink;\nworkflowStaticData.systemPrompt = prepareNode.systemPrompt;\nworkflowStaticData.welcomeMessage = prepareNode.welcomeMessage;\nworkflowStaticData.agentDescription = prepareNode.agentDescription;\nworkflowStaticData.embed_code = embed_code;\nworkflowStaticData.email = email;\n\n// Return structured output\nreturn [\n  {\n    json: {\n      \"Agent ID\": workflowStaticData.agentId,\n      \"Agent Name\": workflowStaticData.agentName,\n      \"Call Link\": workflowStaticData.callLink,\n      \"Embed Code\": workflowStaticData.embed_code,\n      \"Email\": workflowStaticData.email,\n      \"System Prompt\": workflowStaticData.systemPrompt,\n      \"Welcome Message\": workflowStaticData.welcomeMessage,\n      \"Agent Description\": workflowStaticData.agentDescription,\n      \"Saved At\": new Date().toISOString()\n    }\n  }\n];\n"
+      },
+      "id": "a4655823-0e7d-4538-9412-e60304e122e4",
+      "name": "Save Agent Info",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        3200,
+        912
+      ],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "name": "={{ $json.agentName }}",
+        "system_prompt": "={{ $json.systemPrompt }}",
+        "greeting": "={{ $json.welcomeMessage }}",
+        "email": "bharathmunakala22@gmail.com",
+        "callback_events": [
+          "call_ended"
+        ],
+        "callback_url": "https://pertinacious-speechlessly-lidia.ngrok-free.dev/webhook-test/a5b6faad-8f40-4639-8a10-af4d939c88e3"
+      },
+      "type": "CUSTOM.trugen",
+      "typeVersion": 1,
+      "position": [
+        2896,
+        912
+      ],
+      "id": "4d66a563-0916-4347-a3c5-74bf91565dab",
+      "name": "Create a new agent",
+      "credentials": {
+        "trugenApi": {
+          "id": "eNwFcMuVVlTBEaYL",
+          "name": "Trugen account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e3645160-ee25-4ef1-b530-62b3cb4064e9",
+              "name": "choices[0].message.content.companyName",
+              "value": "={{ $json.choices[0].message.content.companyName }}",
+              "type": "string"
+            },
+            {
+              "id": "04ae1efd-a568-40d1-a94b-9357c5308e91",
+              "name": "choices[0].message.content.contactName",
+              "value": "={{ $json.choices[0].message.content.contactName }}",
+              "type": "string"
+            },
+            {
+              "id": "7c127472-f1e0-42fe-9175-2c5f24f4d1e5",
+              "name": "choices[0].message.content.email",
+              "value": "={{ $json.choices[0].message.content.email }}",
+              "type": "string"
+            },
+            {
+              "id": "128f6905-0827-4c42-a039-355bf9cfeeb8",
+              "name": "choices[0].message.content.phone",
+              "value": "={{ $json.choices[0].message.content.phone }}",
+              "type": "string"
+            },
+            {
+              "id": "1c600e13-a836-4a08-bbae-4dafb575c55a",
+              "name": "choices[0].message.content.companySize",
+              "value": "={{ $json.choices[0].message.content.companySize }}",
+              "type": "string"
+            },
+            {
+              "id": "f378e1d1-c7a2-40fe-bb9a-1673282d4136",
+              "name": "choices[0].message.content.industry",
+              "value": "={{ $json.choices[0].message.content.industry }}",
+              "type": "string"
+            },
+            {
+              "id": "c610aa41-d7df-4d2e-aa72-050eaa9a8a51",
+              "name": "choices[0].message.content.persona",
+              "value": "={{ $json.choices[0].message.content.persona }}",
+              "type": "string"
+            },
+            {
+              "id": "19e8b828-501d-4044-969d-f764b3a16044",
+              "name": "choices[0].message.content.decisionAuthority",
+              "value": "={{ $json.choices[0].message.content.decisionAuthority }}",
+              "type": "string"
+            },
+            {
+              "id": "263ecbc3-c17b-4352-acf7-4fdecb2583fd",
+              "name": "choices[0].message.content.currentSolution",
+              "value": "={{ $json.choices[0].message.content.currentSolution }}",
+              "type": "string"
+            },
+            {
+              "id": "28252868-6865-44a9-8844-69175566737c",
+              "name": "choices[0].message.content.painPoints",
+              "value": "={{ $json.choices[0].message.content.painPoints }}",
+              "type": "string"
+            },
+            {
+              "id": "80f16d51-4807-4af9-8e75-de001d437e14",
+              "name": "choices[0].message.content.budgetRange",
+              "value": "={{ $json.choices[0].message.content.budgetRange }}",
+              "type": "string"
+            },
+            {
+              "id": "f5def215-1aee-4e05-b034-538496a377b0",
+              "name": "choices[0].message.content.timeline",
+              "value": "={{ $json.choices[0].message.content.timeline }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2944,
+        1744
+      ],
+      "id": "5350936d-50b6-4d85-b8a6-f2b29b67f9f8",
+      "name": "Set Fields"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "gpt-4o-mini"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Analyze the following sales qualification conversation and extract ONLY the\ninformation that is EXPLICITLY stated by the USER.\n\nIMPORTANT INSTRUCTIONS (STRICT – MUST FOLLOW):\n- Output ONLY valid JSON\n- Use ONLY the keys listed below (no additional keys)\n- Do NOT add explanations, comments, or extra text\n- Do NOT infer, assume, summarize, or guess any information\n- Do NOT derive insights or analysis\n- If a value is missing, unclear, or not explicitly stated → use \"-\"\n- Normalize email addresses to lowercase standard format\n- Normalize phone numbers to international format ONLY when clearly provided\n- Ignore greetings, confirmations, filler words, acknowledgments, and closing statements\n- Extract values ONLY from the USER’s responses (never from the agent’s questions)\n- If multiple values are mentioned, extract the MOST RECENT explicit value\n- If a concept is implied but not explicitly stated, do NOT extract it\n\nFIELDS TO EXTRACT (EXACT KEYS ONLY):\n\nCompany & Contact:\n- companyName\n- contactName\n- email\n- phone\n\nCompany Profile & Persona:\n- companySize\n- industry\n- persona\n- decisionAuthority\n\nCurrent State:\n- currentSolution\n- painPoints\n\nBudget & Timeline:\n- budgetRange\n- timeline\n\nMeta:\n- submissionId\n\nConversation:\n{{ $json.transcript.map(t => t.content).join(' ') }}\n\nReturn EXACTLY the following JSON structure:\n\n{\n  \"companyName\": \"-\",\n  \"contactName\": \"-\",\n  \"email\": \"-\",\n  \"phone\": \"-\",\n  \"companySize\": \"-\",\n  \"industry\": \"-\",\n  \"persona\": \"-\",\n  \"decisionAuthority\": \"-\",\n  \"currentSolution\": \"-\",\n  \"painPoints\": \"-\",\n  \"budgetRange\": \"-\",\n  \"timeline\": \"-\",\n  \"submissionId\": \"-\"\n}",
+              "role": "system"
+            }
+          ]
+        },
+        "simplify": false,
+        "jsonOutput": true,
+        "options": {
+          "temperature": 0.1
+        }
+      },
+      "id": "99bb24be-3be8-43bd-a033-5bb2ab26dc8b",
+      "name": "Analyze Conversation",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "position": [
+        2608,
+        1744
+      ],
+      "typeVersion": 1,
+      "alwaysOutputData": true,
+      "credentials": {
+        "openAiApi": {
+          "id": "mHjcWhupRubJYtTN",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "appToken",
+        "email": "={{ $('Edit Fields').item.json.output.email }}",
+        "additionalFields": {
+          "companySize": "={{ $('Edit Fields').item.json.output.companySize }}",
+          "firstName": "={{ $('Edit Fields').item.json.output.contactName.split(' ')[0] }}",
+          "industry": "={{ $('Edit Fields').item.json.output.industry }}",
+          "jobTitle": "={{ $('Edit Fields').item.json.output.persona }}",
+          "lastName": "={{ $('Edit Fields').item.json.output.contactName.split(' ').slice(1).join(' ') }}",
+          "mobilePhoneNumber": "={{ $('Edit Fields').item.json.output.phone }}",
+          "phoneNumber": "={{ $('Edit Fields').item.json.output.phone }}",
+          "whatsappPhoneNumber": "={{ $('Edit Fields').item.json.output.phone }}"
+        },
+        "options": {
+          "resolveData": false
+        }
+      },
+      "type": "n8n-nodes-base.hubspot",
+      "typeVersion": 2.2,
+      "position": [
+        4544,
+        1424
+      ],
+      "id": "7e3967ae-13ef-4b24-abfe-ae4694b57dc0",
+      "name": "Create or update a contact",
+      "credentials": {
+        "hubspotAppToken": {
+          "id": "xBnDBQzAjo0KNO3K",
+          "name": "HubSpot account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "gpt-4o"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        3184,
+        2048
+      ],
+      "id": "1e7e2bac-ab2f-42f2-bc38-fb2b8c97c2c5",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "mHjcWhupRubJYtTN",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('Get conversation details').item.json.transcript.map(t => t.content).join(' ') }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=You are an expert B2B sales qualification analyst specializing in the BANT methodology.\n\nAnalyze leads strictly based on the provided lead data and conversation transcript.\nDo NOT fabricate facts that contradict the provided data.\n\nYou ARE allowed to:\n- Derive logical conclusions\n- Infer qualitative assessments\n- Assign categorical values\n- Generate recommendations based on standard B2B sales best practices\n\n════════════════════════════════════\nSOURCE OF TRUTH (STRUCTURED DATA)\n════════════════════════════════════\n\nCompany: {{ $json.choices[0].message.content.companyName }}\nContact: {{ $json.choices[0].message.content.contactName }}\nEmail: {{ $json.choices[0].message.content.email }}\nPhone: {{ $json.choices[0].message.content.phone }}\nCompany Size: {{ $json.choices[0].message.content.companySize }}\nIndustry: {{ $json.choices[0].message.content.industry }}\nCurrent Solution: {{ $json.choices[0].message.content.currentSolution }}\nPain Points: {{ $json.choices[0].message.content.painPoints }}\nBudget Range: {{ $json.choices[0].message.content.budgetRange }}\nTimeline: {{ $json.choices[0].message.content.timeline }}\nPersona: {{ $json.choices[0].message.content.persona }}\nDecision Authority: {{ $json.choices[0].message.content.decisionAuthority }}\n\n════════════════════════════════════\nPRIMARY EVIDENCE (CONVERSATION)\n════════════════════════════════════\n\nConversation Transcript (PRIMARY EVIDENCE):\n{{ $('Get conversation details').item.json.transcript.map(t => t.content).join(' ') }}\n\n════════════════════════════════════\nFIELD DERIVATION RULES (MANDATORY)\n════════════════════════════════════\n\n1. dealName\n→ Combine company name + initiative context\nExample: \"<Company Name> – Customer Support Automation\"\n\n2. budgetStatus\n→ \"Confirmed\" if a numeric or range budget is mentioned\n→ \"Unclear\" if not mentioned\n\n3. urgency\n→ High = timeline ≤ 6 weeks\n→ Medium = 2–3 months\n→ Low = > 3 months\n\n4. priority\n→ High if Budget + Authority + Need are strong\n→ Medium if 2 of 3 are strong\n→ Low otherwise\n\n5. dealProbability\n→ High / Medium / Low based on overall BANT strength\n\n6. estimatedDealValue\n→ Use midpoint of budget range if available\n→ Otherwise \"Not disclosed\"\n\n7. opportunitySize\n→ Small / Medium / Large based on company size and budget\n\n8. competitorVulnerability\n→ If current solution is fragmented, manual, or multiple tools, explain why displacement is likely\n\n9. recommendedAction\n→ Always provide one clear, concrete sales action\n\n10. idealSalesRep\n→ Assign role based on deal complexity\n(e.g., Strategic Account Manager for enterprise deals)\n\n11. conversionProbability\n→ High / Medium / Low based on urgency + authority + budget clarity\n\n12. talkingPoints\n→ Generate 2–4 concise sales talking points aligned to pain points and competitor gaps\n\n13. potentialOpportunities\n→ Suggest upsell, expansion, or cross-sell opportunities when applicable\n\n14. redFlags\n→ If none exist, return an empty array []\n\n15. salesCall.feedback\n→ Short qualitative summary of call effectiveness and buyer intent\n\n16. nextSteps\n→ Always include at least 2 concrete, actionable steps\n\n════════════════════════════════════\nBANT SCORING RULES (STRICT – NUMERIC)\n════════════════════════════════════\n\nFor ALL BANT score fields:\n- score MUST be a STRING representing an INTEGER between \"1\" and \"10\"\n- NEVER use High / Medium / Low for score fields\n- NEVER use Yes / No for score fields\n\nNumeric interpretation guidance:\n- \"9\"–\"10\" → Very strong signal, explicitly confirmed\n- \"7\"–\"8\" → Strong signal, clearly indicated\n- \"4\"–\"6\" → Moderate or partially confirmed\n- \"1\"–\"3\" → Weak or unclear\n\nField-specific guidance:\n\n1. bant.budget.score\n→ \"9\"–\"10\" if numeric budget or range is explicitly stated\n→ \"5\"–\"6\" if budget implied but not quantified\n→ \"1\"–\"3\" if budget unclear\n\n2. bant.authority.score\n→ \"9\"–\"10\" if final decision maker confirmed\n→ \"6\"–\"8\" if strong influencer\n→ \"1\"–\"3\" if authority unclear\n\n3. bant.need.score\n→ \"9\"–\"10\" if pain impacts core metrics (CSAT, renewals, revenue)\n→ \"6\"–\"8\" if operational inefficiency\n→ \"1\"–\"3\" if exploratory\n\n4. bant.timeline.score\n→ \"9\"–\"10\" if timeline ≤ 6 weeks\n→ \"6\"–\"8\" if 2–3 months\n→ \"1\"–\"3\" if undefined or long-term\n\nAdditional rules:\n- decisionMaker fields MUST contain a name or role, never boolean values\n- urgency and painSeverity may be High / Medium / Low (non-numeric)\n\n════════════════════════════════════\nLEAD SCORE CALCULATION (MANDATORY)\n════════════════════════════════════\n\nleadScore MUST be an INTEGER between 0 and 100.\n\nCalculation:\n- Convert all BANT scores to numbers\n- Compute the average of the four BANT scores\n- Normalize to a 0–100 scale\n\nFormula (must be followed exactly):\n\nleadScore = ROUND(\n( budget.score + authority.score + need.score + timeline.score ) / 40 * 100\n)\n\nRules:\n- leadScore MUST NOT be 1–10\n- leadScore MUST ALWAYS be 0–100\n- Return only a numeric integer (no strings, no labels)\n\n════════════════════════════════════\nOUTPUT CONTRACT\n════════════════════════════════════\n\nOutput ONLY valid JSON.\nDo NOT include markdown, explanations, or extra text.\nThe output MUST strictly match the provided JSON schema.\nAll fields must be present; use empty strings or empty arrays only when explicitly justified."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        3264,
+        1760
+      ],
+      "id": "55b9f345-8a4f-4547-b379-ed6e24d687fc",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"output\": {\n      \"type\": \"object\",\n      \"properties\": {\n        \"dealName\": { \"type\": \"string\" },\n        \"companyName\": { \"type\": \"string\" },\n        \"contactName\": { \"type\": \"string\" },\n        \"email\": { \"type\": \"string\" },\n        \"phone\": { \"type\": \"string\" },\n        \"companySize\": { \"type\": \"string\" },\n        \"industry\": { \"type\": \"string\" },\n        \"currentSolution\": { \"type\": \"string\" },\n        \"painPoints\": { \"type\": \"string\" },\n        \"budgetRange\": { \"type\": \"string\" },\n        \"budgetStatus\": { \"type\": \"string\" },\n        \"timeline\": { \"type\": \"string\" },\n        \"urgency\": { \"type\": \"string\" },\n        \"persona\": { \"type\": \"string\" },\n        \"decisionAuthority\": { \"type\": \"string\" },\n        \"decisionMaker\": { \"type\": \"string\" },\n        \"leadScore\": { \"type\": \"string\" },\n        \"qualificationTier\": { \"type\": \"string\" },\n        \"priority\": { \"type\": \"string\" },\n        \"dealProbability\": { \"type\": \"string\" },\n        \"estimatedDealValue\": { \"type\": \"string\" },\n        \"potentialOpportunities\": {\n          \"type\": \"array\",\n          \"items\": { \"type\": \"string\" }\n        },\n        \"dealTranscriptAnalysis\": { \"type\": \"string\" },\n        \"salesCall\": {\n          \"type\": \"object\",\n          \"properties\": {\n            \"recommended\": { \"type\": \"string\" },\n            \"reason\": { \"type\": \"string\" },\n            \"feedback\": { \"type\": \"string\" },\n            \"mom\": { \"type\": \"string\" }\n          },\n          \"required\": [\"recommended\", \"reason\", \"feedback\", \"mom\"]\n        },\n        \"bant\": {\n          \"type\": \"object\",\n          \"properties\": {\n            \"budget\": {\n              \"type\": \"object\",\n              \"properties\": {\n                \"score\": { \"type\": \"string\" },\n                \"assessment\": { \"type\": \"string\" },\n                \"hasBudget\": { \"type\": \"string\" }\n              },\n              \"required\": [\"score\", \"assessment\", \"hasBudget\"]\n            },\n            \"authority\": {\n              \"type\": \"object\",\n              \"properties\": {\n                \"score\": { \"type\": \"string\" },\n                \"assessment\": { \"type\": \"string\" },\n                \"decisionMaker\": { \"type\": \"string\" }\n              },\n              \"required\": [\"score\", \"assessment\", \"decisionMaker\"]\n            },\n            \"need\": {\n              \"type\": \"object\",\n              \"properties\": {\n                \"score\": { \"type\": \"string\" },\n                \"assessment\": { \"type\": \"string\" },\n                \"painSeverity\": { \"type\": \"string\" }\n              },\n              \"required\": [\"score\", \"assessment\", \"painSeverity\"]\n            },\n            \"timeline\": {\n              \"type\": \"object\",\n              \"properties\": {\n                \"score\": { \"type\": \"string\" },\n                \"assessment\": { \"type\": \"string\" },\n                \"urgency\": { \"type\": \"string\" }\n              },\n              \"required\": [\"score\", \"assessment\", \"urgency\"]\n            }\n          },\n          \"required\": [\"budget\", \"authority\", \"need\", \"timeline\"]\n        },\n        \"keyInsights\": {\n          \"type\": \"array\",\n          \"items\": { \"type\": \"string\" }\n        },\n        \"redFlags\": {\n          \"type\": \"array\",\n          \"items\": { \"type\": \"string\" }\n        },\n        \"opportunitySize\": { \"type\": \"string\" },\n        \"competitorVulnerability\": { \"type\": \"string\" },\n        \"recommendedAction\": { \"type\": \"string\" },\n        \"idealSalesRep\": { \"type\": \"string\" },\n        \"conversionProbability\": { \"type\": \"string\" },\n        \"nextSteps\": {\n          \"type\": \"array\",\n          \"items\": { \"type\": \"string\" }\n        },\n        \"talkingPoints\": {\n          \"type\": \"array\",\n          \"items\": { \"type\": \"string\" }\n        }\n      },\n      \"required\": [\n        \"dealName\",\n        \"companyName\",\n        \"contactName\",\n        \"leadScore\",\n        \"qualificationTier\"\n      ]\n    }\n  },\n  \"required\": [\"output\"]\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        3472,
+        2032
+      ],
+      "id": "6848727b-60aa-4dd4-8229-fde86cd855be",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "dd454e9b-ea54-4448-b1ca-285ef3af29bb",
+              "name": "output.dealName",
+              "value": "={{ $json.output.dealName }}",
+              "type": "string"
+            },
+            {
+              "id": "c7b2929e-87d1-433b-a030-5be6097fc838",
+              "name": "output.companyName",
+              "value": "={{ $json.output.companyName }}",
+              "type": "string"
+            },
+            {
+              "id": "ec5f121b-9810-496f-9303-90cb11eed534",
+              "name": "output.contactName",
+              "value": "={{ $json.output.contactName }}",
+              "type": "string"
+            },
+            {
+              "id": "55cc1eee-e1a8-4a12-a4be-9c90a08b3827",
+              "name": "output.email",
+              "value": "={{ $json.output.email }}",
+              "type": "string"
+            },
+            {
+              "id": "d8a0d446-3db8-4455-902c-eb40aa1b0321",
+              "name": "output.phone",
+              "value": "={{ $json.output.phone }}",
+              "type": "string"
+            },
+            {
+              "id": "04a9f8d7-23c5-4d50-af1e-c0665f1843f3",
+              "name": "=output.companySize",
+              "value": "={{ $json.output.companySize }}",
+              "type": "string"
+            },
+            {
+              "id": "1e0b1103-984b-4465-8ac2-9a354fb7e4a4",
+              "name": "output.industry",
+              "value": "={{ $json.output.industry }}",
+              "type": "string"
+            },
+            {
+              "id": "fdb4c8a7-e5e4-4b85-a976-d731b06800f0",
+              "name": "output.currentSolution",
+              "value": "={{ $json.output.currentSolution }}",
+              "type": "string"
+            },
+            {
+              "id": "e98128ba-9efc-4bbc-8f09-1e1ee464b0f9",
+              "name": "output.painPoints",
+              "value": "={{ $json.output.painPoints }}",
+              "type": "string"
+            },
+            {
+              "id": "61709b87-ada1-4418-8e0a-7b651ab1a0fe",
+              "name": "output.budgetRange",
+              "value": "={{ $json.output.budgetRange }}",
+              "type": "string"
+            },
+            {
+              "id": "d0c0b12c-10df-4341-8860-22ce70018464",
+              "name": "output.budgetStatus",
+              "value": "={{ $json.output.budgetStatus }}",
+              "type": "string"
+            },
+            {
+              "id": "eae917f1-1f9e-418b-a0fc-851e9cebdd3f",
+              "name": "output.timeline",
+              "value": "={{ $json.output.timeline }}",
+              "type": "string"
+            },
+            {
+              "id": "d0148f1e-a770-4251-9e07-acd6186c354c",
+              "name": "output.urgency",
+              "value": "={{ $json.output.urgency }}",
+              "type": "string"
+            },
+            {
+              "id": "c2c59143-20e9-4f19-ac2e-2b307421099d",
+              "name": "output.persona",
+              "value": "={{ $json.output.persona }}",
+              "type": "string"
+            },
+            {
+              "id": "3196c4a1-2252-4ca0-b294-b5f66824cd8e",
+              "name": "output.decisionAuthority",
+              "value": "={{ $json.output.decisionAuthority }}",
+              "type": "string"
+            },
+            {
+              "id": "fe110198-1c1a-4443-924a-ff2e2b9d647d",
+              "name": "output.decisionAuthority",
+              "value": "={{ $json.output.decisionAuthority }}",
+              "type": "string"
+            },
+            {
+              "id": "9c83166c-2e77-45ff-a6e5-1d4119528f54",
+              "name": "output.decisionMaker",
+              "value": "={{ $json.output.decisionMaker }}",
+              "type": "string"
+            },
+            {
+              "id": "be9dbc9d-62b8-46a0-923b-c692d136cfb4",
+              "name": "output.leadScore",
+              "value": "={{ $json.output.leadScore }}",
+              "type": "string"
+            },
+            {
+              "id": "81a3df2f-1452-42e7-b617-ab7831188016",
+              "name": "output.qualificationTier",
+              "value": "={{ $json.output.qualificationTier }}",
+              "type": "string"
+            },
+            {
+              "id": "6245c6ba-13a7-4358-8317-dcb70fa7adab",
+              "name": "output.priority",
+              "value": "={{ $json.output.priority }}",
+              "type": "string"
+            },
+            {
+              "id": "e0a482ef-4140-47dd-8e7e-1ac514e02e8d",
+              "name": "output.dealProbability",
+              "value": "={{ $json.output.dealProbability }}",
+              "type": "string"
+            },
+            {
+              "id": "45c7c963-6dfb-4cdb-97f7-b4c647616649",
+              "name": "output.estimatedDealValue",
+              "value": "={{ $json.output.estimatedDealValue }}",
+              "type": "string"
+            },
+            {
+              "id": "b74b7eb2-aa4a-49ea-b902-8b54ade4e554",
+              "name": "output.potentialOpportunities",
+              "value": "={{ $json.output.potentialOpportunities }}",
+              "type": "array"
+            },
+            {
+              "id": "d39e3cc1-90ef-4268-b7f6-ad929f29aba6",
+              "name": "output.salesCall",
+              "value": "={{ $json.output.salesCall }}",
+              "type": "object"
+            },
+            {
+              "id": "f7019e62-217d-47f0-bda2-eb927f94000a",
+              "name": "output.bant.budget",
+              "value": "={{ $json.output.bant.budget }}",
+              "type": "object"
+            },
+            {
+              "id": "772aa06c-e401-4d56-9a3a-6aaa6c8666f7",
+              "name": "output.bant.authority",
+              "value": "={{ $json.output.bant.authority }}",
+              "type": "object"
+            },
+            {
+              "id": "48868687-3c12-4e0c-a85c-2ad06853f5b9",
+              "name": "output.bant.need",
+              "value": "={{ $json.output.bant.need }}",
+              "type": "object"
+            },
+            {
+              "id": "06619088-b2b7-4c64-89bb-5ea3181681e8",
+              "name": "output.bant.timeline",
+              "value": "={{ $json.output.bant.timeline }}",
+              "type": "object"
+            },
+            {
+              "id": "9c86dddf-4605-45fe-b7ff-d2a421eea4f3",
+              "name": "output.keyInsights",
+              "value": "={{ $json.output.keyInsights }}",
+              "type": "array"
+            },
+            {
+              "id": "56f0d172-1c2e-4269-adee-9c4894f1ffda",
+              "name": "output.redFlags",
+              "value": "={{ $json.output.redFlags }}",
+              "type": "array"
+            },
+            {
+              "id": "8437f95c-ad39-4b13-bae1-925c9a5494cd",
+              "name": "output.opportunitySize",
+              "value": "={{ $json.output.opportunitySize }}",
+              "type": "string"
+            },
+            {
+              "id": "846ff4ec-950c-42f8-a088-a9e117808444",
+              "name": "output.competitorVulnerability",
+              "value": "={{ $json.output.competitorVulnerability }}",
+              "type": "string"
+            },
+            {
+              "id": "d4ba5e41-c849-4d63-ab18-7520d254b755",
+              "name": "output.recommendedAction",
+              "value": "={{ $json.output.recommendedAction }}",
+              "type": "string"
+            },
+            {
+              "id": "f18cd114-2201-467f-8caa-76f60e1c97f3",
+              "name": "output.idealSalesRep",
+              "value": "={{ $json.output.idealSalesRep }}",
+              "type": "string"
+            },
+            {
+              "id": "832a6b41-f3f6-4b78-9cd6-ed8993e51e6e",
+              "name": "output.conversionProbability",
+              "value": "={{ $json.output.conversionProbability }}",
+              "type": "string"
+            },
+            {
+              "id": "e7dff119-d839-45dd-ad91-9ab2dcfb43f9",
+              "name": "output.nextSteps",
+              "value": "={{ $json.output.nextSteps }}",
+              "type": "array"
+            },
+            {
+              "id": "186cce61-009a-4554-bcd6-2b85ab17bf79",
+              "name": "output.talkingPoints",
+              "value": "={{ $json.output.talkingPoints }}",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        3728,
+        1776
+      ],
+      "id": "d00334e9-71c9-4454-b4c0-6aa5cd9f361e",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "resource": "conversation",
+        "conversation_id": "={{ $json.body.conversation_id }}",
+        "wait_for_completion": true
+      },
+      "type": "CUSTOM.trugen",
+      "typeVersion": 1,
+      "position": [
+        2304,
+        1744
+      ],
+      "id": "45f0e1d3-dfe3-4e61-a55e-db0d56673ba3",
+      "name": "Get conversation details",
+      "credentials": {
+        "trugenApi": {
+          "id": "eNwFcMuVVlTBEaYL",
+          "name": "Trugen account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "a5b6faad-8f40-4639-8a10-af4d939c88e3",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        2048,
+        1744
+      ],
+      "id": "f5dc4b2c-5501-4526-8edd-d9667a1252f4",
+      "name": "Webhook",
+      "webhookId": "a5b6faad-8f40-4639-8a10-af4d939c88e3"
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1rAKmFD54NKH710I_hVlv532tr0hbBNrkfejyGVuGeWU",
+          "mode": "list",
+          "cachedResultName": "SALES QUALIFICATION",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1rAKmFD54NKH710I_hVlv532tr0hbBNrkfejyGVuGeWU/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 976566003,
+          "mode": "list",
+          "cachedResultName": "Saved Call Info",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1rAKmFD54NKH710I_hVlv532tr0hbBNrkfejyGVuGeWU/edit#gid=976566003"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Agent ID": "={{ $json['Agent ID'] }}",
+            "Agent Name": "={{ $json['Agent Name'] }}",
+            "Call Link": "={{ $json['Call Link'] }}",
+            "Embed Code": "={{ $json['Embed Code'] }}",
+            "Email": "={{ $json.Email }}",
+            "Saved At": "={{ $json['Saved At'] }}"
+          },
+          "matchingColumns": [
+            "Agent ID"
+          ],
+          "schema": [
+            {
+              "id": "Agent ID",
+              "displayName": "Agent ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Agent Name",
+              "displayName": "Agent Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Call Link",
+              "displayName": "Call Link",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Embed Code",
+              "displayName": "Embed Code",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "System Prompt",
+              "displayName": "System Prompt",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Welcome Message",
+              "displayName": "Welcome Message",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Agent Description",
+              "displayName": "Agent Description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Saved At",
+              "displayName": "Saved At",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "bd1532de-dfd9-4156-b9fa-04cb22252fe4",
+      "name": "Save to Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "position": [
+        3584,
+        912
+      ],
+      "typeVersion": 4.6,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Ou6ciRrfN3tE5MZc",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// ========== SALES QUALIFICATION AGENT DESCRIPTION ==========\n// This description guides the agent to collect required sales lead\n// information using natural, polite, and adaptive questioning.\n\nconst agentDescription = `\nYou are a Sales Qualification Agent responsible for engaging prospects and\ncollecting essential lead information in a conversational, professional,\nand structured manner.\n\nYour role is STRICTLY information gathering.\nYou must NOT pitch, demo, negotiate, recommend solutions, or provide opinions.\n\n==================================================\nINTERACTION RULES (MANDATORY)\n==================================================\n- Ask ONLY ONE question at a time.\n- Proceed to the NEXT question ONLY after the current question is answered.\n- Do NOT skip any field listed below.\n- Do NOT guess, infer, or autofill any information.\n- If the user does not know an answer, record \"-\" and continue.\n- You may politely rephrase a question ONCE if unclear.\n- Maintain a professional, calm, and helpful tone at all times.\n\n==================================================\nSECTION 1: COMPANY & CONTACT INFORMATION\n==================================================\n\nCompany Name (companyName)\n- \"What is the name of your company?\"\n- \"Could you please tell me your organization’s name?\"\n- \"Which company are you representing today?\"\n\nContact Name (contactName)\n- \"May I know your full name?\"\n- \"Who am I speaking with?\"\n- \"Could you please share your name?\"\n\nEmail Address (email)\n- \"What’s the best email address to reach you?\"\n- \"Where should we send follow-up information?\"\n- \"Could you provide your work email address?\"\n\nPhone Number (phone)\n- \"What phone number should we use if needed?\"\n- \"Is there a contact number we can reach you on?\"\n- \"Could you share your preferred phone number?\"\n\n==================================================\nSECTION 2: COMPANY PROFILE & PERSONA\n==================================================\n\nCompany Size (companySize)\n- \"How many employees does your company currently have?\"\n- \"What’s the approximate size of your team?\"\n- \"Would you say your organization is small, mid-sized, or large?\"\n\nIndustry (industry)\n- \"Which industry do you operate in?\"\n- \"What sector does your business belong to?\"\n- \"Could you tell me about your company’s industry?\"\n\nPersona / Role (persona)\n- \"What is your role in the organization?\"\n- \"How are you involved in this initiative?\"\n\nDecision Authority (decisionAuthority)\n- \"Are you the final decision-maker for this initiative?\"\n- \"Who else is involved in approving or evaluating this?\"\n\n==================================================\nSECTION 3: CURRENT STATE & NEEDS\n==================================================\n\nCurrent Solution (currentSolution)\n- \"What solution are you currently using, if any?\"\n- \"Are you using any existing tools or platforms today?\"\n- \"How are you handling this process right now?\"\n\nPain Points (painPoints)\n- \"What are the main challenges you’re trying to solve?\"\n- \"What problems led you to explore this?\"\n- \"Where are you facing the most difficulty currently?\"\n\n==================================================\nSECTION 4: BUDGET & TIMELINE\n==================================================\n\nBudget Range (budgetRange)\n- \"What budget range are you considering for this initiative?\"\n- \"Do you have a budget allocated for this?\"\n- \"Roughly how much are you planning to invest?\"\n\nTimeline (timeline)\n- \"When are you planning to move forward?\"\n- \"What does your expected timeline look like?\"\n- \"Are you looking to proceed soon or later?\"\n\n==================================================\nCLOSING INSTRUCTIONS\n==================================================\n- After ALL fields are collected, briefly confirm the information.\n- Inform the prospect that the details will be reviewed internally.\n- Do NOT pitch, demo, or discuss pricing.\n- End the conversation politely and professionally.\n\nOnce all details are collected, ensure the data is structured and submitted\nwith a unique submissionId, timestamp, and raw conversation transcript.\n`;\n\n\n// Do not change anything below this line\nreturn [\n  {\n    json: {\n      agentDescription: agentDescription.trim(),\n      timestamp: new Date().toISOString()\n    }\n  }\n];\n"
+      },
+      "id": "02ae53e6-e4b7-41bc-9716-fca13a90dd5d",
+      "name": "📝 Call Description",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        2352,
+        912
+      ],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "content": "## 🟢 Step 1: Sales Qualification Context\n\n**Add your sales qualification instructions in this code node**\n\nThis node defines how the AI Sales Qualification Agent should interact with prospects.\n\nIt ensures the agent:\n- Collects complete lead and company information step by step\n- Asks only one question at a time\n- Follows a structured qualification flow (company, role, needs, budget, timeline)\n- Maintains a professional, neutral, non-sales tone\n- Avoids pitching, demos, or recommendations\n\nThis node sets the rules and conversation structure only.  \nIt does not score or route leads — it prepares clean, reliable data for downstream qualification, routing, and CRM actions.\n",
+        "height": 560,
+        "width": 528,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1968,
+        496
+      ],
+      "typeVersion": 1,
+      "id": "f8743501-ceba-4b0d-9e47-2711e9a1c867",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## 🔵 Step 2: Create Your Sales Agent\n\nThis node creates the Sales Qualification AI agent using the prepared agent description and system rules.\n\nIt configures the agent’s avatar, name, welcome message, and strict conversation behavior to ensure the agent:\n- Collects required lead information step by step\n- Asks only one question at a time\n- Maintains a professional, non-sales tone\n- Avoids pitching, demos, or pricing discussions\n\n**This step also:**\n1. Creates the Sales Qualification Agent  \n2. Gets your setup link  \n\nThis only needs to be done **ONCE**.\n",
+        "height": 576,
+        "width": 528,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        2544,
+        496
+      ],
+      "typeVersion": 1,
+      "id": "7605cae9-2dfa-4c4c-84b6-7fea979257d4",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "## ✅ Setup Complete!\n\n**Your interview link:**\n`https://app.trugen.ai/agent/[agent-id]`\n\n \nThis step will now setup our agent id and job description which is now automatically passed and used by webhook.",
+        "height": 408,
+        "width": 331,
+        "color": 2
+      },
+      "id": "317567e9-0747-4fa0-83ad-0cc7e041ce62",
+      "name": "Success!",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        3104,
+        656
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## Google Sheets Setup\n\n**Quick Start**:\n1. Copy this Google Sheets template:  \n   https://docs.google.com/spreadsheets/d/1rAKmFD54NKH710I_hVlv532tr0hbBNrkfejyGVuGeWU/edit?usp=sharing\n2. Connect your Google account credentials in this node.\n3. Update the Google Sheets node to use your copied document and select the **'Saved Call Info'** sheet  \n   (if not selected automatically).\n4. The generated qualification link will appear in this sheet, which you can share with prospects to start the qualification process.\n\n**Connect your Google Sheets here →**\n",
+        "height": 512,
+        "width": 432,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        3456,
+        560
+      ],
+      "typeVersion": 1,
+      "id": "86996137-6981-4713-9871-cf77e4f34d0d",
+      "name": "Sticky Note8"
+    },
+    {
+      "parameters": {
+        "content": "## 🟣 Step 3: Automated Lead Scoring & CRM Sync\n\n**This section runs automatically to:**\n- Receive completed calls\n- Capture conversation ID and full call transcript\n- Analyze responses using AI\n- Save structured results to Google Sheets\n\n**Before activating:**  \nMake sure to configure the webhook URL in **Create Agents → Callback URL** and set the **Callback Event** to **Call Ended** so completed call data and transcripts are sent to this workflow.\n",
+        "height": 528,
+        "width": 576,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1920,
+        1408
+      ],
+      "typeVersion": 1,
+      "id": "8491f0db-17dd-414e-939a-eb4e202c649d",
+      "name": "Sticky Note9"
+    },
+    {
+      "parameters": {
+        "content": "## 🟣 Step 3.1: Sales Conversation Extraction\n\nThis node reviews the full sales qualification call transcript and captures\nonly the information that the prospect explicitly states.\n\n• Extracts company, contact, role, needs, budget, and timeline details\n• Ignores agent questions, greetings, and filler responses\n• Does not assume, infer, or analyze any information\n• Marks missing or unclear details as not provided\n• Keeps only the most recent user-provided values\n\nPurpose:\nEnsure clean, accurate, and structured lead data for downstream workflows\nwithout hallucination or interpretation.\n",
+        "height": 512,
+        "width": 560,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        2544,
+        1408
+      ],
+      "typeVersion": 1,
+      "id": "e777046a-16ee-4665-98bc-204736b0aa9f",
+      "name": "Sticky Note10"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Intelligent Routing Logic": {
+      "main": [
+        [
+          {
+            "node": "Notify Sales Rep",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Send Lead Confirmation",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Create or update a contact",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Log to Tracking Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "▶️ Click to Start Setup": {
+      "main": [
+        [
+          {
+            "node": "📝 Call Description",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Interview Agent": {
+      "main": [
+        [
+          {
+            "node": "Create a new agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a new agent": {
+      "main": [
+        [
+          {
+            "node": "Save Agent Info",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Fields": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze Conversation": {
+      "main": [
+        [
+          {
+            "node": "Set Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save Agent Info": {
+      "main": [
+        [
+          {
+            "node": "Save to Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Intelligent Routing Logic",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get conversation details": {
+      "main": [
+        [
+          {
+            "node": "Analyze Conversation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Get conversation details",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "📝 Call Description": {
+      "main": [
+        [
+          {
+            "node": "Prepare Interview Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "df3fd53a-de3c-4dbd-9812-5ae78427c854",
+  "meta": {
+    "instanceId": "e1198f585f1d67aa5daf373ed640b4d6557142b5cb697dfb9b69d31d6dcaab77"
+  },
+  "id": "nEPmjzxNzjxYyq2v",
+  "tags": []
+}

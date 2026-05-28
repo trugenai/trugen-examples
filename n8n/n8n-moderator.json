@@ -1,0 +1,363 @@
+{
+  "name": "My workflow 6",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "invigilator-input",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "034385b4-6edf-4d7f-83cc-976931ca1bbf",
+      "name": "Webhook - Receive User Speech",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        -3088,
+        512
+      ],
+      "webhookId": "invigilator-webhook-001"
+    },
+    {
+      "parameters": {
+        "jsCode": "const body = $input.first().json.body || $input.first().json;\n\nconst eventName = body.event?.name || '';\nconst payload = body.event?.payload || {};\n\n// 🔥 Extract conversation_id safely\nconst conversationId =\n  body.conversation_id ||\n  body.conversationId ||\n  payload.conversation_id ||\n  payload.conversationId ||\n  '';\n\nif (eventName === 'utterance_committed') {\n  return [{\n    json: {\n      conversation_id: conversationId,\n      user_text: payload.text || ''\n    }\n  }];\n}\n\n// manual test\nif (body.text) {\n  return [{\n    json: {\n      conversation_id: 'manual-test',\n      user_text: body.text\n    }\n  }];\n}\n\nreturn [];"
+      },
+      "id": "1b0b2890-c1ef-481d-8a22-c15548d0d8c2",
+      "name": "Parse & Validate Input",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2864,
+        512
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $input.first().json;\n\n// SAFETY: fallback to empty string\nconst text = (input.user_text || '').toLowerCase();\n\nconst offensiveKeywords = [\n  'idiot', 'stupid', 'moron', 'retard',\n  'hate', 'kill', 'die',\n  'abuse', 'harass', 'threat', 'cheat', 'fraud'\n];\n\nconst isOffensive = offensiveKeywords.some(word => text.includes(word));\n\nreturn [{\n  json: {\n    ...input,\n    is_offensive: isOffensive\n  }\n}];"
+      },
+      "id": "5d812a5d-50ab-48ef-84a5-b45718374af7",
+      "name": "Offensive Content Detector",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2640,
+        512
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{ $json.is_offensive }}",
+              "value2": true
+            }
+          ]
+        }
+      },
+      "id": "c94198ad-b203-4aa5-a829-af0adc3082ba",
+      "name": "Is Offensive?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        -2416,
+        512
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $getWorkflowStaticData('global');\n\nconst conversationId = $input.first().json.conversation_id;\n\n// safety check\nif (!conversationId) {\n  throw new Error(\"Missing conversation_id\");\n}\n\n// initialize if not exists\nif (!data[conversationId]) {\n  data[conversationId] = 0;\n}\n\n// increment\ndata[conversationId] += 1;\n\nconst warningCount = data[conversationId];\n\nlet warningMessage = '';\n\nif (warningCount === \"1\") {\n  warningMessage = 'Warning 1 of 3: Please maintain respectful language. Offensive speech is not allowed in this session.';\n} else if (warningCount === \"2\") {\n  warningMessage = 'Warning 2 of 3: This is your second warning. Please stop using offensive language immediately or the session will be terminated.';\n} else {\n  warningMessage = 'Final Warning: You have used offensive language 3 times. This session is now being terminated.';\n}\n\nreturn [{\n  json: {\n    conversation_id: conversationId,\n    warning_count: warningCount,\n    warning_message: warningMessage,\n    should_terminate: warningCount >= 3\n  }\n}];"
+      },
+      "id": "b8ef0775-8461-4802-85e1-07826c465266",
+      "name": "Increment Warning & Build Message",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2192,
+        416
+      ]
+    },
+    {
+      "parameters": {
+        "method": "PUT",
+        "url": "=https://api.trugen.ai/v1/conversation/{{ $json.conversation_id }}/speak",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-api-key",
+              "value": "0396f96e892542829ee01efbfd953c0b"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"text\": \"{{ $json.warning_message }}\",\n  \"metadata\": {\n    \"warning_count\": \"{{ $json.warning_count }}\"\n  }\n}",
+        "options": {}
+      },
+      "id": "b93bc5fe-ddb6-4601-814c-cd0e99c057f2",
+      "name": "Trugen Speak - Send Warning",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        -2000,
+        288
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [],
+          "number": [
+            {
+              "value1": "={{ $('Increment Warning & Build Message').item.json.warning_count }}",
+              "operation": "equal",
+              "value2": 3
+            }
+          ]
+        }
+      },
+      "id": "d3df0db0-2289-4094-b7c6-26623dbcab41",
+      "name": "3 Warnings Reached?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        -1744,
+        416
+      ]
+    },
+    {
+      "parameters": {
+        "method": "DELETE",
+        "url": "=https://api.trugen.ai/v1/conversation/{{ $json.conversation_id }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-api-key",
+              "value": "=0396f96e892542829ee01efbfd953c0b"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "5f0d5ff8-524a-4421-b20e-ac6cd35a32c2",
+      "name": "Trugen Delete - End Conversation",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        -1520,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{\n  json: {\n    status: 'terminated',\n    conversation_id: $input.first().json.conversation_id,\n    reason: 'Conversation terminated after 3 offensive language warnings.'\n  }\n}];"
+      },
+      "id": "3c7881ac-6c46-458b-9568-8e5c4d536d1f",
+      "name": "Build Termination Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1296,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{\n  json: {\n    status: 'warned',\n    conversation_id: $input.first().json.conversation_id,\n    warning_count: $input.first().json.warning_count,\n    message: 'Warning issued. Session continues.'\n  }\n}];"
+      },
+      "id": "c3f5987c-ce9e-46cf-98d4-8a587273c498",
+      "name": "Build Warning Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1296,
+        512
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{\n  json: {\n    status: 'clean',\n    conversation_id: $input.first().json.conversation_id,\n    warning_count: $input.first().json.warning_count,\n    message: 'No offensive content detected. Session continues normally.'\n  }\n}];"
+      },
+      "id": "12d901b3-7ad8-4838-b173-3b052dc155b1",
+      "name": "Build Clean Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1296,
+        704
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify($json) }}",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "id": "5b39a61b-c829-4c89-a73a-21a020556af3",
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        -1072,
+        512
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook - Receive User Speech": {
+      "main": [
+        [
+          {
+            "node": "Parse & Validate Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse & Validate Input": {
+      "main": [
+        [
+          {
+            "node": "Offensive Content Detector",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Offensive Content Detector": {
+      "main": [
+        [
+          {
+            "node": "Is Offensive?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Offensive?": {
+      "main": [
+        [
+          {
+            "node": "Increment Warning & Build Message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Build Clean Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Increment Warning & Build Message": {
+      "main": [
+        [
+          {
+            "node": "Trugen Speak - Send Warning",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Trugen Speak - Send Warning": {
+      "main": [
+        [
+          {
+            "node": "3 Warnings Reached?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "3 Warnings Reached?": {
+      "main": [
+        [
+          {
+            "node": "Trugen Delete - End Conversation",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Build Warning Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Trugen Delete - End Conversation": {
+      "main": [
+        [
+          {
+            "node": "Build Termination Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Termination Response": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Warning Response": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Clean Response": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "da841528-1435-4ca5-8888-b3d434e4ba1c",
+  "meta": {
+    "instanceId": "e9bfecf6f60ce1c0fa48f3a6deadb9c96c19e101b224307912424073cbc467be"
+  },
+  "id": "GTnpZdA7ZCdSKN1r",
+  "tags": []
+}

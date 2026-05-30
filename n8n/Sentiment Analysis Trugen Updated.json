@@ -7,23 +7,23 @@
         "height": 640,
         "width": 544
       },
-      "id": "e6c63c47-0962-481b-beff-f8cbbb5cd9fd",
+      "id": "ec2cb007-ea1e-4d4d-a452-57e269c7def2",
       "name": "Main Overview Sticky",
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        -656,
-        656
+        -560,
+        384
       ],
       "typeVersion": 1
     },
     {
       "parameters": {},
-      "id": "a6234d7e-5612-49d8-9b7b-479eebe76068",
+      "id": "8721b8a6-cdd9-4391-aab4-2beaa0d50bbe",
       "name": "▶️ Click to Start Setup",
       "type": "n8n-nodes-base.manualTrigger",
       "position": [
-        -32,
-        720
+        64,
+        448
       ],
       "typeVersion": 1
     },
@@ -31,41 +31,14 @@
       "parameters": {
         "jsCode": "const workflowStaticData = $getWorkflowStaticData('global');\n\n// Agent creation response\nconst agentId = $input.first().json.id;\nconst agentLink = $input.first().json.call_link;\n\n// CX Feedback preparation node\nconst satisfactionDescription = $('Prepare TruGen Feedback Intelligence Agent')\n  .first()\n  .json\n  .trugenCustomerSatisfactionDescription;\n\nconst agentName = $('Prepare TruGen Feedback Intelligence Agent').first().json.agentName;\nconst systemPrompt = $('Prepare TruGen Feedback Intelligence Agent').first().json.systemPrompt;\nconst welcomeMessage = $('Prepare TruGen Feedback Intelligence Agent').first().json.welcomeMessage;\n\n// Store globally for downstream sentiment / CSAT workflows\nworkflowStaticData.agentId = agentId;\nworkflowStaticData.trugenCustomerSatisfactionDescription = satisfactionDescription;\nworkflowStaticData.agentLink = agentLink;\n\nreturn [{\n  json: {\n    \"Agent ID\": workflowStaticData.agentId,\n    \"Agent Name\": agentName,\n    \"Agent Link\": workflowStaticData.agentLink,\n    \"CX Description\": workflowStaticData.trugenCustomerSatisfactionDescription,\n    \"System Prompt\": systemPrompt,\n    \"Welcome Message\": welcomeMessage,\n    \"Agent Purpose\": \"Customer Satisfaction & Call Sentiment Analysis\"\n  }\n}];"
       },
-      "id": "63d8e9b6-43e7-459b-bbb8-95459e5e0698",
+      "id": "a5af7074-b2ca-4547-9a3a-bbb48d7a908b",
       "name": "Save Agent Info",
       "type": "n8n-nodes-base.code",
       "position": [
-        1088,
-        736
+        1184,
+        464
       ],
       "typeVersion": 2
-    },
-    {
-      "parameters": {
-        "name": "={{ $json.agentName }}",
-        "system_prompt": "={{ $json.systemPrompt }}",
-        "greeting": "={{ $json.welcomeMessage }}",
-        "email": "bharathmunakala22@gmail.com",
-        "record": false,
-        "callback_events": [
-          "call_ended"
-        ],
-        "callback_url": "https://pertinacious-speechlessly-lidia.ngrok-free.dev/webhook-test/a5b6faad-8f40-4639-8a10-af4d939c88e3"
-      },
-      "type": "CUSTOM.trugen",
-      "typeVersion": 1,
-      "position": [
-        784,
-        720
-      ],
-      "id": "38d9f11a-c5f6-4772-beb7-37634dfd6e1c",
-      "name": "Create a new agent",
-      "credentials": {
-        "trugenApi": {
-          "id": "eNwFcMuVVlTBEaYL",
-          "name": "Trugen account"
-        }
-      }
     },
     {
       "parameters": {
@@ -76,33 +49,12 @@
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2.1,
       "position": [
-        32,
-        1424
+        128,
+        1152
       ],
-      "id": "ac0da5e2-5fe1-4941-bfec-6100fb542fcb",
+      "id": "7f818d47-c6f2-4097-9c4b-61e3114db90a",
       "name": "Webhook",
       "webhookId": "a5b6faad-8f40-4639-8a10-af4d939c88e3"
-    },
-    {
-      "parameters": {
-        "resource": "conversation",
-        "conversation_id": "={{ $json.body.conversation_id }}",
-        "wait_for_completion": true
-      },
-      "type": "CUSTOM.trugen",
-      "typeVersion": 1,
-      "position": [
-        320,
-        1424
-      ],
-      "id": "83bb52f7-5b29-4dd1-aef4-cc1e40920f67",
-      "name": "Get conversation details",
-      "credentials": {
-        "trugenApi": {
-          "id": "eNwFcMuVVlTBEaYL",
-          "name": "Trugen account"
-        }
-      }
     },
     {
       "parameters": {
@@ -148,12 +100,12 @@
         },
         "options": {}
       },
-      "id": "fb5e008c-a6b7-4f8b-b13d-db96214878e1",
+      "id": "81f868ac-01f1-4901-a465-5792239ef4a3",
       "name": "Prepare TruGen Feedback Intelligence Agent",
       "type": "n8n-nodes-base.set",
       "position": [
-        528,
-        720
+        624,
+        448
       ],
       "typeVersion": 3.4
     },
@@ -161,12 +113,12 @@
       "parameters": {
         "jsCode": "// ========== PASTE YOUR CUSTOMER SATISFACTION DESCRIPTION HERE ==========\n// Optimized for Call Sentiment, CSAT, and Experience Analysis\n\nconst trugenCustomerSatisfactionDescription = `\nTruGen.ai – Customer Experience Feedback & Satisfaction Analysis\n\nThis AI agent is designed to collect structured and unstructured customer feedback after users interact with the TruGen.ai platform, including video agents, voice agents, or meeting agents. The goal is to understand real user sentiment, satisfaction levels, and experiential quality — not to sell.\n\nPurpose of This Interaction\nThe intent of this conversation is to gather honest feedback about the user's experience with TruGen.ai. Their responses will be used for:\n• Call sentiment analysis\n• CSAT scoring\n• Product improvement insights\n• Quality benchmarking across agents and plans\n\nThe agent should sound neutral, curious, and conversational — never promotional or sales-driven.\n\n---\n\nCore Experience Areas to Evaluate\n\n1. Interaction Quality\nUnderstand how natural and human-like the conversation felt.\n• Did the AI avatar feel realistic or robotic?\n• Were facial expressions, tone, and responses engaging?\n• Did the interaction feel smooth or artificial?\n\n2. Response Accuracy & Understanding\nAssess how well the AI understood the user.\n• Were the answers accurate and relevant?\n• Did the agent understand intent correctly?\n• Were there moments of confusion or incorrect responses?\n\n3. Latency & Performance\nEvaluate real-time performance.\n• How fast were the responses?\n• Did the conversation feel instant or delayed?\n• Were there interruptions, lags, or pauses?\n\n4. Ease of Use\nMeasure onboarding and usability.\n• Was it easy to start and interact with the agent?\n• Did anything feel unclear or difficult?\n• Was the experience intuitive overall?\n\n5. Plan & Feature Perception (Non-Sales)\nGather perception-based feedback without pitching.\n• If you tried the Free Plan, did it feel sufficient for testing?\n• Did any limitations stand out during usage?\n• Would additional features improve your experience?\n\n6. Emotional Response & Trust\nCapture subjective sentiment.\n• How did interacting with the AI make you feel?\n• Did you feel comfortable and understood?\n• Would you trust this agent in a real business scenario?\n\n---\n\nCSAT-Oriented Questions (Agent-Guided)\n\nThe agent should naturally ask questions such as:\n• On a scale of 1–5, how satisfied were you with this interaction?\n• What did you like most about the experience?\n• What felt frustrating or could be improved?\n• Did the AI feel more human-like or more robotic to you?\n• How would you describe the response speed?\n• How accurate were the answers given?\n• Would you use this type of AI agent again?\n\nFollow-up prompts should be adaptive, such as:\n• \"That’s helpful — could you tell me a bit more?\"\n• \"What made you feel that way?\"\n• \"Was there a specific moment that stood out?\"\n\n---\n\nConversation Guidelines for the Agent\n\n• Maintain a friendly, neutral, and non-sales tone  \n• Do not pitch pricing or plans  \n• Do not persuade or influence opinions  \n• Encourage honest, open-ended feedback  \n• Validate responses without agreeing or disagreeing  \n• Keep the conversation flowing naturally  \n\n---\n\nClosing the Conversation\n\nEnd the interaction politely:\n• Thank the user for their time\n• Reinforce that their feedback helps improve the platform\n• Do not introduce new topics at the end\n\nThis interaction should leave the user feeling heard, respected, and comfortable sharing honest feedback.\n`;\n\n// Don't change anything below this line\nreturn [{\n  json: {\n    trugenCustomerSatisfactionDescription: trugenCustomerSatisfactionDescription.trim(),\n    timestamp: new Date().toISOString()\n  }\n}];\n"
       },
-      "id": "588998f2-cefd-4bb1-91b0-9c464fcb965d",
+      "id": "5d6c2d98-47f3-417c-a497-16e00f123f2f",
       "name": "CustomerSatisfaction Description",
       "type": "n8n-nodes-base.code",
       "position": [
-        240,
-        720
+        336,
+        448
       ],
       "typeVersion": 2
     },
@@ -175,13 +127,13 @@
         "schemaType": "manual",
         "inputSchema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"sentiment\": {\n      \"type\": \"string\",\n      \"enum\": [\"Positive\", \"Negative\", \"Neutral\", \"Mixed\"],\n      \"description\": \"Overall sentiment of the conversation based only on user statements.\"\n    },\n    \"csat_score\": {\n      \"type\": \"number\",\n      \"minimum\": 1,\n      \"maximum\": 5,\n      \"description\": \"Customer Satisfaction Score from 1 to 5, where 5 is highly satisfied.\"\n    },\n    \"confidence\": {\n      \"type\": \"number\",\n      \"minimum\": 0,\n      \"maximum\": 1,\n      \"description\": \"Confidence level of the analysis from 0 to 1.\"\n    },\n    \"user_conversation_summary\": {\n      \"type\": \"string\",\n      \"description\": \"Concise summary of only the user's statements and feedback during the conversation.\"\n    },\n    \"key_insights\": {\n      \"type\": \"array\",\n      \"items\": {\n        \"type\": \"string\"\n      },\n      \"description\": \"3–5 actionable insights derived from the user's feedback.\"\n    },\n    \"pain_points\": {\n      \"type\": \"array\",\n      \"items\": {\n        \"type\": \"string\"\n      },\n      \"description\": \"Problems, frustrations, or concerns expressed by the user.\"\n    },\n    \"positive_aspects\": {\n      \"type\": \"array\",\n      \"items\": {\n        \"type\": \"string\"\n      },\n      \"description\": \"Positive feedback or satisfaction indicators mentioned by the user.\"\n    },\n    \"resolution_status\": {\n      \"type\": \"string\",\n      \"enum\": [\"Resolved\", \"Pending\", \"Escalated\", \"Unresolved\"],\n      \"description\": \"Current status of the user's issue, if any.\"\n    },\n    \"emotion_detected\": {\n      \"type\": \"string\",\n      \"description\": \"Primary emotion detected from the user's tone (e.g., Satisfaction, Frustration, Neutral, Confidence).\"\n    }\n  },\n  \"required\": [\n    \"sentiment\",\n    \"csat_score\",\n    \"confidence\",\n    \"user_conversation_summary\",\n    \"resolution_status\",\n    \"emotion_detected\"\n  ],\n  \"additionalProperties\": false,\n  \"$schema\": \"http://json-schema.org/draft-07/schema#\"\n}\n"
       },
-      "id": "92140b4a-72c1-4921-961a-45a55d8b1dce",
+      "id": "635d67bd-1537-4b23-bf56-576647c09129",
       "name": "Structured Output Parser",
       "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
       "typeVersion": 1.3,
       "position": [
-        1072,
-        1728
+        1168,
+        1456
       ]
     },
     {
@@ -193,13 +145,13 @@
           "systemMessage": "You are an expert sentiment analysis AI specialized in customer service conversations.\n\nYour task is to analyze full conversation transcripts and generate an accurate, structured sentiment analysis. You must:\n\n- Infer overall sentiment from language, tone, and conversation flow\n- Assign a CSAT score (1–5) based on customer satisfaction indicators\n- Estimate a confidence score (0–1) reflecting reliability of the analysis\n- Extract 3–5 concise, actionable key insights\n- Identify explicit and implicit customer pain points\n- Capture positive aspects or praise when present\n- Determine the issue resolution status based on conversation outcome\n- Detect the primary emotion expressed by the customer\n\nRules:\n- Output must strictly match the provided JSON schema\n- Use only allowed enum values where defined\n- Do not hallucinate details not supported by the transcript\n- Do not include explanations, comments, or extra text\n- Always return valid JSON\n"
         }
       },
-      "id": "cf305157-4002-469f-905b-27b429baf56a",
+      "id": "51f6ba01-f393-49ac-8d96-30b42e92766a",
       "name": "AI Agent - Sentiment & CSAT Analysis",
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 3.1,
       "position": [
-        832,
-        1456
+        928,
+        1184
       ]
     },
     {
@@ -282,13 +234,13 @@
         },
         "options": {}
       },
-      "id": "aaf0e520-a45c-4399-812d-44b339866675",
+      "id": "8c7a0b55-e7c9-46f9-9e10-a8011b6f5857",
       "name": "Format for Google Sheets",
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        1408,
-        1392
+        1504,
+        1120
       ]
     },
     {
@@ -434,28 +386,22 @@
         },
         "options": {}
       },
-      "id": "5310a84a-9250-422f-95df-dcd1c25ced9e",
+      "id": "846cca06-28c0-412b-a7b0-9b053e8e34c5",
       "name": "Store in Google Sheets",
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.7,
       "position": [
-        1632,
-        1392
-      ],
-      "credentials": {
-        "googleSheetsOAuth2Api": {
-          "id": "Ou6ciRrfN3tE5MZc",
-          "name": "Google Sheets account"
-        }
-      }
+        1728,
+        1120
+      ]
     },
     {
       "parameters": {
         "model": {
           "__rl": true,
-          "value": "gpt-4o-mini",
+          "value": "gpt-4.1-mini",
           "mode": "list",
-          "cachedResultName": "gpt-4o-mini"
+          "cachedResultName": "gpt-4.1-mini"
         },
         "builtInTools": {},
         "options": {}
@@ -463,15 +409,15 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
       "typeVersion": 1.3,
       "position": [
-        672,
-        1728
+        768,
+        1488
       ],
-      "id": "41a15132-7fab-4209-a559-fa783ca97f94",
+      "id": "655b0305-a036-4ad4-b61c-a755819233df",
       "name": "4.1-Mini",
       "credentials": {
         "openAiApi": {
-          "id": "mHjcWhupRubJYtTN",
-          "name": "OpenAi account"
+          "id": "MAbG8Acjw4pdMMl2",
+          "name": "OpenAI account"
         }
       }
     },
@@ -480,26 +426,27 @@
         "operation": "append",
         "documentId": {
           "__rl": true,
-          "value": "1PXUZy-6IozD78GeoInjLZ0ZjF4jFKt8YK9U9kGXt7yc",
+          "value": "114EVCBdbPWGioqj9zpNSahhSkNWbEKPpT9B355E8yAA",
           "mode": "list",
-          "cachedResultName": "Sentiment Analysis",
-          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1PXUZy-6IozD78GeoInjLZ0ZjF4jFKt8YK9U9kGXt7yc/edit?usp=drivesdk"
+          "cachedResultName": "Untitled spreadsheet",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/114EVCBdbPWGioqj9zpNSahhSkNWbEKPpT9B355E8yAA/edit?usp=drivesdk"
         },
         "sheetName": {
           "__rl": true,
-          "value": 1056557033,
+          "value": "gid=0",
           "mode": "list",
-          "cachedResultName": "Interview Info",
-          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1PXUZy-6IozD78GeoInjLZ0ZjF4jFKt8YK9U9kGXt7yc/edit#gid=1056557033"
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/114EVCBdbPWGioqj9zpNSahhSkNWbEKPpT9B355E8yAA/edit#gid=0"
         },
         "columns": {
           "mappingMode": "defineBelow",
           "value": {
             "Agent ID": "={{ $json['Agent ID'] }}",
             "Agent Name": "={{ $json['Agent Name'] }}",
-            "Agent Link": "={{ $json['Agent Link'] }}",
+            "Interview Link": "={{ $json['Agent Link'] }}",
+            "Job Description": "={{ $json['CX Description'] }}",
             "Welcome Message": "={{ $json['Welcome Message'] }}",
-            "Agent Purpose": "={{ $json['Agent Purpose'] }}"
+            "System Prompt": "={{ $json['System Prompt'] }}"
           },
           "matchingColumns": [],
           "schema": [
@@ -510,8 +457,7 @@
               "defaultMatch": false,
               "display": true,
               "type": "string",
-              "canBeUsedToMatch": true,
-              "removed": false
+              "canBeUsedToMatch": true
             },
             {
               "id": "Agent Name",
@@ -520,18 +466,34 @@
               "defaultMatch": false,
               "display": true,
               "type": "string",
-              "canBeUsedToMatch": true,
-              "removed": false
+              "canBeUsedToMatch": true
             },
             {
-              "id": "Agent Link",
-              "displayName": "Agent Link",
+              "id": "Interview Link",
+              "displayName": "Interview Link",
               "required": false,
               "defaultMatch": false,
               "display": true,
               "type": "string",
-              "canBeUsedToMatch": true,
-              "removed": false
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Job Description",
+              "displayName": "Job Description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "System Prompt",
+              "displayName": "System Prompt",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
             },
             {
               "id": "Welcome Message",
@@ -540,18 +502,124 @@
               "defaultMatch": false,
               "display": true,
               "type": "string",
-              "canBeUsedToMatch": true,
-              "removed": false
+              "canBeUsedToMatch": true
             },
             {
-              "id": "Agent Purpose",
-              "displayName": "Agent Purpose",
+              "id": "Candidate Name",
+              "displayName": "Candidate Name",
               "required": false,
               "defaultMatch": false,
               "display": true,
               "type": "string",
-              "canBeUsedToMatch": true,
-              "removed": false
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Candidate ID",
+              "displayName": "Candidate ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Conversation ID",
+              "displayName": "Conversation ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Interview Date",
+              "displayName": "Interview Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Duration (minutes)",
+              "displayName": "Duration (minutes)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Fit Score",
+              "displayName": "Fit Score",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Recommendation",
+              "displayName": "Recommendation",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Strengths",
+              "displayName": "Strengths",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Concerns",
+              "displayName": "Concerns",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Summary",
+              "displayName": "Summary",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Next Steps",
+              "displayName": "Next Steps",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Call ID",
+              "displayName": "Call ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Analyzed On",
+              "displayName": "Analyzed On",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
             }
           ],
           "attemptToConvertTypes": false,
@@ -559,17 +627,17 @@
         },
         "options": {}
       },
-      "id": "b4e28263-3a12-44df-854d-d345cb55a52c",
+      "id": "6f3beea7-8c63-4152-8e02-c6e5f333adf6",
       "name": "Save to Google Sheets",
       "type": "n8n-nodes-base.googleSheets",
       "position": [
-        1504,
-        720
+        1600,
+        448
       ],
       "typeVersion": 4.6,
       "credentials": {
         "googleSheetsOAuth2Api": {
-          "id": "Ou6ciRrfN3tE5MZc",
+          "id": "UqgqLsQd0VplpaVH",
           "name": "Google Sheets account"
         }
       }
@@ -583,11 +651,11 @@
       },
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        -96,
-        272
+        0,
+        0
       ],
       "typeVersion": 1,
-      "id": "54429d70-aec9-4e5d-b0c6-6ddc92975857",
+      "id": "d90003f5-8768-42ee-a2ab-c18804f48cfd",
       "name": "Sticky Note"
     },
     {
@@ -599,11 +667,11 @@
       },
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        448,
-        272
+        544,
+        0
       ],
       "typeVersion": 1,
-      "id": "1f95b0de-7581-4681-9bb2-2a37c9a09dd0",
+      "id": "b57514f7-5da7-4568-90df-f4da6f4584fe",
       "name": "Sticky Note1"
     },
     {
@@ -613,12 +681,12 @@
         "width": 331,
         "color": 2
       },
-      "id": "56168525-a445-4462-92ea-9a7e6735203c",
+      "id": "dc91bd07-da72-4e28-9c13-83d3ae5f1a9c",
       "name": "Success!",
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        976,
-        480
+        1072,
+        208
       ],
       "typeVersion": 1
     },
@@ -631,11 +699,11 @@
       },
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        1328,
-        384
+        1424,
+        112
       ],
       "typeVersion": 1,
-      "id": "83b53d35-4ebd-4bd2-aef0-20401832314c",
+      "id": "4f4fe2ce-338a-4ea3-bc7c-20094c73fed3",
       "name": "Sticky Note2"
     },
     {
@@ -647,11 +715,11 @@
       },
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        -64,
-        1136
+        32,
+        864
       ],
       "typeVersion": 1,
-      "id": "b134e12c-5c79-46f0-b567-09b716f1e206",
+      "id": "9bb78c9e-130e-4261-88ea-e1cbd6c2659c",
       "name": "Sticky Note3"
     },
     {
@@ -663,11 +731,11 @@
       },
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        656,
-        976
+        752,
+        704
       ],
       "typeVersion": 1,
-      "id": "75067626-57e7-4e09-8acc-6ce7b7f27f46",
+      "id": "f9d8e06c-e11b-44ec-8c46-3cd855d3a083",
       "name": "Sticky Note4"
     },
     {
@@ -678,12 +746,57 @@
       },
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        1312,
-        1152
+        1408,
+        880
       ],
       "typeVersion": 1,
-      "id": "da80566d-872c-432e-bb4b-bccd78b2091a",
+      "id": "a2004f7e-da13-4d96-a8df-5c8842c6e802",
       "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "name": "={{ $json.agentName }}",
+        "system_prompt": "={{ $json.systemPrompt }}",
+        "greeting": "={{ $json.welcomeMessage }}",
+        "maxSessionLengthMinutes": 5,
+        "callback_events": [
+          "call_ended"
+        ],
+        "callback_url": "https://pertinacious-speechlessly-lidia.ngrok-free.dev/webhook-test/a5b6faad-8f40-4639-8a10-af4d939c88e3"
+      },
+      "type": "n8n-nodes-trugen.trugen",
+      "typeVersion": 1,
+      "position": [
+        912,
+        448
+      ],
+      "id": "50871db4-8bf0-4f0a-a6f2-f1257b10dd5c",
+      "name": "TruGen",
+      "credentials": {
+        "trugenApi": {
+          "id": "sj48uMTHmLTqMnEs",
+          "name": "TruGen.AI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getConversation"
+      },
+      "type": "n8n-nodes-trugen.trugen",
+      "typeVersion": 1,
+      "position": [
+        496,
+        1152
+      ],
+      "id": "a5045875-6329-41e2-bb10-c5155ef4d891",
+      "name": "TruGen1",
+      "credentials": {
+        "trugenApi": {
+          "id": "sj48uMTHmLTqMnEs",
+          "name": "TruGen.AI account"
+        }
+      }
     }
   ],
   "pinData": {},
@@ -710,33 +823,11 @@
         ]
       ]
     },
-    "Create a new agent": {
-      "main": [
-        [
-          {
-            "node": "Save Agent Info",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "Webhook": {
       "main": [
         [
           {
-            "node": "Get conversation details",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Get conversation details": {
-      "main": [
-        [
-          {
-            "node": "AI Agent - Sentiment & CSAT Analysis",
+            "node": "TruGen1",
             "type": "main",
             "index": 0
           }
@@ -747,7 +838,7 @@
       "main": [
         [
           {
-            "node": "Create a new agent",
+            "node": "TruGen",
             "type": "main",
             "index": 0
           }
@@ -808,17 +899,39 @@
           }
         ]
       ]
+    },
+    "TruGen": {
+      "main": [
+        [
+          {
+            "node": "Save Agent Info",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TruGen1": {
+      "main": [
+        [
+          {
+            "node": "AI Agent - Sentiment & CSAT Analysis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "active": false,
   "settings": {
     "executionOrder": "v1",
-    "availableInMCP": false
+    "binaryMode": "separate"
   },
-  "versionId": "8dc9f3e0-729d-4087-913e-295277bcc98b",
+  "versionId": "540795b7-6111-4eb6-b0be-ec7ffe0b3be1",
   "meta": {
-    "instanceId": "e1198f585f1d67aa5daf373ed640b4d6557142b5cb697dfb9b69d31d6dcaab77"
+    "instanceId": "e9bfecf6f60ce1c0fa48f3a6deadb9c96c19e101b224307912424073cbc467be"
   },
-  "id": "30qfUlWtGnLBFC37",
+  "id": "ukO9T5RL9ys4P6ZL",
   "tags": []
 }

@@ -7,12 +7,12 @@
         "height": 624,
         "width": 544
       },
-      "id": "911391e2-63f0-4c92-ad14-7f97e0422f23",
+      "id": "002b6cb3-e977-4049-82b1-727b2d9e5a76",
       "name": "Main Overview Sticky",
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        1280,
-        864
+        -688,
+        368
       ],
       "typeVersion": 1
     },
@@ -22,12 +22,12 @@
         "height": 636,
         "width": 472
       },
-      "id": "93c29873-bc83-4d26-bb6b-aacb2ce36486",
+      "id": "ddbaa111-971b-45f6-90d2-6bd666a732f6",
       "name": "Sticky Note2",
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        3136,
-        1312
+        1200,
+        832
       ],
       "typeVersion": 1
     },
@@ -38,12 +38,12 @@
         "width": 612,
         "color": 2
       },
-      "id": "869043fd-a265-48a7-bf23-efdc82df9a07",
+      "id": "b5f98edf-3684-4a75-b488-c916ef3008cc",
       "name": "Sticky Note3",
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        3632,
-        1264
+        1664,
+        768
       ],
       "typeVersion": 1
     },
@@ -51,12 +51,12 @@
       "parameters": {
         "jsCode": "// =====================================================\n// Intelligent Lead Routing Engine\n// Score-Based + Industry-Specific Assignment\n// =====================================================\n\n// -----------------------------\n// Sales Team Configuration\n// -----------------------------\nconst salesTeam = {\n  senior: [\n    {\n      name: \"Munakala Bharath\",\n      email: \"br7601225@gmail.com\",\n      industries: [\"Technology\", \"SaaS\", \"Enterprise Software\", \"Cloud Services\", \"Customer Support\"],\n      minLeadScore: 75,\n      tier: \"Hot\",\n      maxActiveLeads: 10,\n      currentLeads: 8,\n      specialization: \"Enterprise SaaS & Cloud Solutions\"\n    },\n    {\n      name: \"Sarah Mitchell\",\n      email: \"sarah.mitchell@company.com\",\n      industries: [\"Fintech\", \"Banking\", \"Financial Services\", \"Insurance\"],\n      minLeadScore: 75,\n      tier: \"Hot\",\n      maxActiveLeads: 10,\n      currentLeads: 6,\n      specialization: \"Financial Technology & Banking\"\n    }\n  ],\n  midLevel: [\n    {\n      name: \"Bharath Reddy\",\n      email: \"bharathmunakala22@gmail.com\",\n      industries: [\"Professional Services\", \"Consulting\", \"Education\", \"Healthcare\"],\n      minLeadScore: 50,\n      tier: \"Warm\",\n      maxActiveLeads: 15,\n      currentLeads: 10,\n      specialization: \"Professional Services & Education\"\n    },\n    {\n      name: \"Michael Chen\",\n      email: \"michael.chen@company.com\",\n      industries: [\"E-commerce\", \"Retail\", \"Business Services\", \"Manufacturing\"],\n      minLeadScore: 50,\n      tier: \"Warm\",\n      maxActiveLeads: 15,\n      currentLeads: 12,\n      specialization: \"E-commerce & Retail Solutions\"\n    },\n    {\n      name: \"Jessica Taylor\",\n      email: \"jessica.taylor@company.com\",\n      industries: [\"Marketing\", \"Advertising\", \"Media\", \"Entertainment\"],\n      minLeadScore: 50,\n      tier: \"Warm\",\n      maxActiveLeads: 15,\n      currentLeads: 9,\n      specialization: \"Marketing & Media Technology\"\n    }\n  ],\n  sdr: [\n    {\n      name: \"Emily Brown\",\n      email: \"emily.brown@company.com\",\n      industries: [\"All\"],\n      minLeadScore: 25,\n      tier: \"Cold\",\n      maxActiveLeads: 30,\n      currentLeads: 25,\n      specialization: \"General Lead Development\"\n    },\n    {\n      name: \"David Rodriguez\",\n      email: \"david.rodriguez@company.com\",\n      industries: [\"All\"],\n      minLeadScore: 25,\n      tier: \"Cold\",\n      maxActiveLeads: 30,\n      currentLeads: 22,\n      specialization: \"Lead Qualification & Nurture\"\n    }\n  ],\n  nurture: [\n    {\n      name: \"Marketing Automation\",\n      email: \"marketing.automation@company.com\",\n      industries: [\"All\"],\n      minLeadScore: 0,\n      tier: \"Unqualified\",\n      maxActiveLeads: 1000,\n      currentLeads: 450,\n      specialization: \"Automated Nurture Campaigns\"\n    }\n  ]\n};\n\n// -----------------------------\n// Extract Data from Previous Node Output\n// -----------------------------\nconst output = $input.first().json.output || {};\n\n// Basic Information\nconst dealName = output.dealName || \"-\";\nconst companyName = output.companyName || \"-\";\nconst contactName = output.contactName || \"-\";\nconst industry = output.industry || \"-\";\nconst currentSolution = output.currentSolution || \"-\";\n\n// BANT Scores - Extract from nested bant object\nconst budgetScore = output.bant?.budget?.score || 0;\nconst budgetAssessment = output.bant?.budget?.assessment || \"-\";\nconst hasBudget = output.bant?.budget?.hasBudget === \"Yes\" || output.bant?.budget?.hasBudget === true;\n\nconst authorityScore = output.bant?.authority?.score || 0;\nconst authorityAssessment = output.bant?.authority?.assessment || \"-\";\nconst decisionMaker = output.bant?.authority?.decisionMaker || output.decisionMaker || \"-\";\nconst isDecisionMaker = decisionMaker !== \"-\" && decisionMaker !== \"\";\n\nconst needScore = output.bant?.need?.score || 0;\nconst needAssessment = output.bant?.need?.assessment || \"-\";\nconst painSeverity = output.bant?.need?.painSeverity || \"low\";\n\nconst timelineScore = output.bant?.timeline?.score || 0;\nconst timelineAssessment = output.bant?.timeline?.assessment || \"-\";\nconst timeline = output.bant?.timeline?.timeline || \"-\";\nconst urgency = output.bant?.timeline?.urgency || \"low\";\n\n// Calculate Lead Score from BANT components\nconst bantScores = [budgetScore, authorityScore, needScore, timelineScore].filter(s => s > 0);\nconst averageBantScore = bantScores.length > 0 \n  ? bantScores.reduce((a, b) => a + b, 0) / bantScores.length \n  : 0;\n\n// Convert to 0-100 scale\nconst calculatedLeadScore = Math.round(averageBantScore * 10);\n\n// Use provided leadScore or calculated\nconst finalLeadScore = output.leadScore || calculatedLeadScore;\n\n// Other Important Fields\nconst keyInsights = Array.isArray(output.keyInsights) ? output.keyInsights : [];\nconst redFlagsInput = Array.isArray(output.redFlags) ? output.redFlags : [];\nconst opportunitySize = output.opportunitySize || \"-\";\nconst competitorVulnerability = output.competitorVulnerability || \"-\";\nconst recommendedAction = output.recommendedAction || \"-\";\nconst idealSalesRep = output.idealSalesRep || \"-\";\nconst conversionProbability = output.conversionProbability || \"0%\";\nconst nextStepsInput = Array.isArray(output.nextSteps) ? output.nextSteps : [];\nconst talkingPoints = Array.isArray(output.talkingPoints) ? output.talkingPoints : [];\nconst estimatedDealValue = output.estimatedDealValue || \"-\";\nconst momInput = output.mom || null;\nconst painPoints = output.painPoints || needAssessment || \"-\";\n\n// -----------------------------\n// Qualification Tier Determination\n// -----------------------------\nlet qualificationTier = \"Unqualified\";\nlet repLevelCategory = \"nurture\";\n\n// Score-based routing\nif (finalLeadScore >= 75) {\n  qualificationTier = \"Hot\";\n  repLevelCategory = \"senior\";\n} else if (finalLeadScore >= 50 && finalLeadScore < 75) {\n  qualificationTier = \"Warm\";\n  repLevelCategory = \"midLevel\";\n} else if (finalLeadScore >= 25 && finalLeadScore < 50) {\n  qualificationTier = \"Cold\";\n  repLevelCategory = \"sdr\";\n} else {\n  qualificationTier = \"Unqualified\";\n  repLevelCategory = \"nurture\";\n}\n\n// Override with provided qualificationTier\nif (output.qualificationTier) {\n  const tier = output.qualificationTier.toString().toLowerCase();\n  if (tier === \"hot\" || tier === \"a\") {\n    qualificationTier = \"Hot\";\n    repLevelCategory = \"senior\";\n  } else if (tier === \"warm\" || tier === \"b\") {\n    qualificationTier = \"Warm\";\n    repLevelCategory = \"midLevel\";\n  } else if (tier === \"cold\" || tier === \"c\") {\n    qualificationTier = \"Cold\";\n    repLevelCategory = \"sdr\";\n  }\n}\n\n// Escalate based on BANT signals\nif (budgetScore >= 9 && authorityScore >= 9 && needScore >= 8 && timelineScore >= 8) {\n  qualificationTier = \"Hot\";\n  repLevelCategory = \"senior\";\n}\n\n// -----------------------------\n// Priority Assignment\n// -----------------------------\nlet priority = \"Low\";\n\nif (finalLeadScore >= 75 || qualificationTier === \"Hot\") {\n  priority = \"High\";\n} else if (finalLeadScore >= 50 || qualificationTier === \"Warm\") {\n  priority = \"Medium\";\n} else if (finalLeadScore >= 25 || qualificationTier === \"Cold\") {\n  priority = \"Low\";\n} else {\n  priority = \"Nurture\";\n}\n\n// Escalate based on urgency\nif (urgency === \"High\" || urgency === \"immediate\") {\n  if (priority === \"Medium\") priority = \"High\";\n  if (priority === \"Low\") priority = \"Medium\";\n}\n\n// Escalate if decision maker confirmed\nif (isDecisionMaker && priority === \"Low\" && finalLeadScore >= 25) {\n  priority = \"Medium\";\n}\n\n// Escalate if pain severity is high\nif (painSeverity === \"High\") {\n  if (priority === \"Low\") priority = \"Medium\";\n  if (priority === \"Medium\" && urgency === \"High\") priority = \"High\";\n}\n\n// -----------------------------\n// Persona Classification\n// -----------------------------\nlet persona = \"Influencer\";\n\nif (isDecisionMaker) {\n  persona = \"Economic Buyer\";\n} else if (authorityScore >= 7) {\n  persona = \"Champion\";\n}\n\n// -----------------------------\n// Industry-Based Rep Matching\n// -----------------------------\nfunction findBestRep(repLevel, industry) {\n  let eligibleReps = salesTeam[repLevel];\n  \n  // Priority 1: Industry match with available capacity\n  let industryMatchReps = eligibleReps.filter(rep => \n    rep.currentLeads < rep.maxActiveLeads &&\n    (rep.industries.includes(industry) || rep.industries.includes(\"All\"))\n  );\n  \n  if (industryMatchReps.length > 0) {\n    return industryMatchReps.reduce((prev, current) => \n      prev.currentLeads < current.currentLeads ? prev : current\n    );\n  }\n  \n  // Priority 2: Any rep with capacity\n  let availableReps = eligibleReps.filter(rep => \n    rep.currentLeads < rep.maxActiveLeads\n  );\n  \n  if (availableReps.length > 0) {\n    return availableReps.reduce((prev, current) => \n      prev.currentLeads < current.currentLeads ? prev : current\n    );\n  }\n  \n  // Priority 3: Least loaded rep\n  return eligibleReps.reduce((prev, current) => \n    prev.currentLeads < current.currentLeads ? prev : current\n  );\n}\n\nconst assignedRep = findBestRep(repLevelCategory, industry);\n\n// -----------------------------\n// Enhanced Deal Name\n// -----------------------------\nconst enhancedDealName = dealName !== \"-\" \n  ? dealName\n  : companyName !== \"-\" \n    ? `${companyName} – ${qualificationTier} Lead`\n    : `${qualificationTier} Lead – ${contactName}`;\n\n// -----------------------------\n// Red Flags Analysis\n// -----------------------------\nconst redFlags = [...redFlagsInput];\n\nif (!isDecisionMaker) {\n  redFlags.push(\"Decision-making authority not confirmed\");\n}\n\nif (!hasBudget) {\n  redFlags.push(\"Budget not clearly defined or confirmed\");\n}\n\nif (urgency !== \"High\" && urgency !== \"immediate\") {\n  redFlags.push(\"Urgency level is not high\");\n}\n\nif (industry === \"-\") {\n  redFlags.push(\"Industry not identified\");\n}\n\nif (currentSolution === \"-\") {\n  redFlags.push(\"Current solution not documented\");\n}\n\n// -----------------------------\n// Sales Call Recommendation\n// -----------------------------\nconst salesCall = {\n  recommended: qualificationTier === \"Hot\" || qualificationTier === \"Warm\",\n  priority: priority,\n  reason: qualificationTier === \"Hot\" \n    ? \"High-priority lead with strong BANT qualification signals\"\n    : qualificationTier === \"Warm\"\n    ? \"Moderate qualification - schedule discovery call\"\n    : qualificationTier === \"Cold\"\n    ? \"Initial qualification call recommended\"\n    : \"Lead requires nurturing before sales engagement\",\n  suggestedTimeframe: urgency === \"High\" || urgency === \"immediate\"\n    ? \"Within 24 hours\"\n    : urgency === \"Medium\"\n    ? \"Within 3-5 business days\"\n    : timeline.includes(\"weeks\")\n    ? \"Within 1 week\"\n    : \"Within 1-2 weeks\"\n};\n\n// -----------------------------\n// Meeting Notes (MOM)\n// -----------------------------\nconst mom = momInput || {\n  summary: `${qualificationTier} lead with ${isDecisionMaker ? 'confirmed' : 'unconfirmed'} decision maker: ${contactName}`,\n  painPoints: painPoints !== \"-\" ? painPoints : needAssessment,\n  budgetStatus: budgetAssessment,\n  timeline: timelineAssessment,\n  authority: isDecisionMaker ? `Confirmed - ${contactName}` : \"Not confirmed\",\n  currentSolution: currentSolution,\n  keyInsights: keyInsights,\n  urgency: urgency,\n  painSeverity: painSeverity\n};\n\n// -----------------------------\n// Next Steps\n// -----------------------------\nconst nextSteps = nextStepsInput.length > 0 \n  ? nextStepsInput \n  : [\n      qualificationTier === \"Hot\" \n        ? \"Schedule product demo within 24-48 hours\"\n        : qualificationTier === \"Warm\"\n        ? \"Conduct discovery call within 3-5 days\"\n        : qualificationTier === \"Cold\"\n        ? \"Initial qualification and needs assessment\"\n        : \"Enroll in automated nurture campaign\"\n    ];\n\n// -----------------------------\n// Feedback\n// -----------------------------\nconst feedback = recommendedAction !== \"-\"\n  ? recommendedAction\n  : qualificationTier === \"Hot\"\n  ? `IMMEDIATE ACTION REQUIRED: High-priority ${persona} with ${urgency} urgency. All BANT criteria met.`\n  : qualificationTier === \"Warm\"\n  ? `Action within 3-5 days: ${persona} showing interest with ${urgency} urgency.`\n  : qualificationTier === \"Cold\"\n  ? \"Focus on relationship building and pain point discovery\"\n  : \"Enroll in nurture sequence until qualification improves\";\n\n// -----------------------------\n// Routing Decision Metadata\n// -----------------------------\nconst routingDecision = {\n  routedTo: assignedRep.name,\n  routedToEmail: assignedRep.email,\n  routedLevel: repLevelCategory.toUpperCase(),\n  routingReason: `Lead Score: ${finalLeadScore}/100 (${qualificationTier}) | Industry: ${industry} | Urgency: ${urgency} | Decision Maker: ${isDecisionMaker ? 'Yes' : 'No'}`,\n  industry: industry,\n  urgency: urgency,\n  decisionMaker: isDecisionMaker,\n  decisionMakerName: decisionMaker,\n  hasBudget: hasBudget,\n  painSeverity: painSeverity,\n  routedAt: new Date().toISOString(),\n  routingScore: finalLeadScore\n};\n\n// -----------------------------\n// BANT Summary\n// -----------------------------\nconst bantSummary = {\n  overallScore: finalLeadScore,\n  scoreBreakdown: {\n    budget: budgetScore,\n    authority: authorityScore,\n    need: needScore,\n    timeline: timelineScore\n  },\n  budget: {\n    score: budgetScore,\n    assessment: budgetAssessment,\n    hasBudget: hasBudget,\n    estimatedValue: estimatedDealValue\n  },\n  authority: {\n    score: authorityScore,\n    assessment: authorityAssessment,\n    decisionMaker: decisionMaker,\n    isConfirmed: isDecisionMaker\n  },\n  need: {\n    score: needScore,\n    assessment: needAssessment,\n    painSeverity: painSeverity,\n    painPoints: painPoints\n  },\n  timeline: {\n    score: timelineScore,\n    assessment: timelineAssessment,\n    timeline: timeline,\n    urgency: urgency\n  }\n};\n\n// -----------------------------\n// Final Output\n// -----------------------------\nreturn {\n  json: {\n    // Lead Identification\n    dealName: enhancedDealName,\n    companyName,\n    contactName,\n    industry,\n    \n    // Scoring & Qualification\n    leadScore: finalLeadScore,\n    qualificationTier,\n    priority,\n    persona,\n    conversionProbability,\n    estimatedDealValue,\n    \n    // BANT Analysis\n    bantSummary,\n    \n    // Routing Assignment\n    assignedRep: {\n      name: assignedRep.name,\n      email: assignedRep.email,\n      level: repLevelCategory,\n      tier: assignedRep.tier,\n      specialization: assignedRep.specialization,\n      currentLeadLoad: assignedRep.currentLeads,\n      maxCapacity: assignedRep.maxActiveLeads,\n      loadPercentage: Math.round((assignedRep.currentLeads / assignedRep.maxActiveLeads) * 100) + \"%\",\n      industries: assignedRep.industries\n    },\n    \n    // Intelligence & Analysis\n    redFlags,\n    keyInsights,\n    opportunitySize,\n    competitorVulnerability,\n    idealSalesRep,\n    currentSolution,\n    \n    // Action Items\n    salesCall,\n    nextSteps,\n    talkingPoints,\n    feedback,\n    mom,\n    \n    // Metadata\n    routingDecision,\n    \n    // Original Data Reference\n    sourceData: {\n      dealName: output.dealName,\n      companyName: output.companyName,\n      industry: output.industry\n    }\n  }\n};"
       },
-      "id": "b04ad95b-a352-447d-ad68-bc58ce0b71aa",
+      "id": "ddbc05ad-f2a5-4187-83ff-21859f0bb719",
       "name": "Intelligent Routing Logic",
       "type": "n8n-nodes-base.code",
       "position": [
-        3968,
-        1776
+        2000,
+        1280
       ],
       "typeVersion": 2
     },
@@ -67,12 +67,12 @@
         "width": 416,
         "color": 4
       },
-      "id": "ae0d66df-e174-4d51-8392-30ab085f3983",
+      "id": "e93593ec-fea0-423f-8888-7af4e1e3753b",
       "name": "Sticky Note4",
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        4384,
-        1264
+        2416,
+        768
       ],
       "typeVersion": 1
     },
@@ -83,12 +83,12 @@
         "width": 420,
         "color": 6
       },
-      "id": "48f45ab0-7505-4d00-aac6-d40aa8c8b008",
+      "id": "a656a64a-f707-401d-b81c-0a64bc4ff199",
       "name": "Sticky Note5",
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        4912,
-        1184
+        2944,
+        688
       ],
       "typeVersion": 1
     },
@@ -99,21 +99,15 @@
         "message": "=<div style=\"font-family: Arial, sans-serif; max-width: 700px; margin: 0 auto; border: 1px solid #e0e0e0; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.1);\">\n\n  <!-- Header -->\n  <div style=\"background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center;\">\n    <h1 style=\"margin: 0;\">🎯 New {{ $json.qualificationTier }} Lead Assigned</h1>\n    <p style=\"margin: 10px 0 0 0;\">\n      Lead Score: <strong>{{ $json.leadScore }}/100</strong>\n    </p>\n  </div>\n\n  <!-- Lead Information -->\n  <div style=\"background-color: #f8f9fa; padding: 25px;\">\n    <h2>Lead Information</h2>\n    <p><strong>Contact:</strong> {{ $json.contactName }}</p>\n    <p><strong>Company:</strong> {{ $json.companyName }}</p>\n    <p><strong>Email:</strong> {{ $('Edit Fields').item.json.output.email }}</p>\n    <p><strong>Phone:</strong> {{ $('Edit Fields').item.json.output.phone }}</p>\n    <p><strong>Budget:</strong> {{ $json.bantSummary.budget.estimatedValue }}</p>\n  </div>\n\n  <!-- BANT Breakdown -->\n  <div style=\"background-color: #ffffff; padding: 25px;\">\n    <h2>BANT Breakdown</h2>\n    <p><strong>Budget:</strong> {{ $json.bantSummary.budget.score }}/10</p>\n    <p><strong>Authority:</strong> {{ $json.bantSummary.authority.score }}/10</p>\n    <p><strong>Need:</strong> {{ $json.bantSummary.need.score }}/10</p>\n    <p><strong>Timeline:</strong> {{ $json.bantSummary.timeline.score }}/10</p>\n  </div>\n\n  <!-- Key Insights -->\n  <div style=\"background-color: #fff3cd; padding: 20px; border-radius: 5px;\">\n    <h3>Key Insights</h3>\n    <ul style=\"margin: 10px 0; padding-left: 20px;\">\n      {{\n        ($json.keyInsights || []).map(item => `<li>${item}</li>`).join('')\n      }}\n    </ul>\n  </div>\n\n  <!-- Next Steps -->\n  <div style=\"background-color: #d4edda; padding: 20px; border-radius: 5px;\">\n    <h3>Next Steps</h3>\n    <ol style=\"margin: 10px 0; padding-left: 20px;\">\n      {{\n        ($json.nextSteps || []).map(step => `<li>${step}</li>`).join('')\n      }}\n    </ol>\n  </div>\n\n  <!-- Footer -->\n  <div style=\"background-color: #667eea; color: white; padding: 20px 30px; text-align: center;\">\n    <p style=\"margin: 0; font-size: 14px;\">© 2026 {{ $json.companyName }}. All rights reserved.</p>\n  </div>\n\n</div>",
         "options": {}
       },
-      "id": "5fa4dc43-6d46-4d28-8838-7fc41aa6f67c",
+      "id": "0a2a098f-8188-447b-97c9-4757c77fc8f1",
       "name": "Notify Sales Rep",
       "type": "n8n-nodes-base.gmail",
       "position": [
-        5072,
-        1520
+        3104,
+        1024
       ],
       "webhookId": "996cc104-f473-4071-bf4f-671bf6273036",
-      "typeVersion": 2.1,
-      "credentials": {
-        "gmailOAuth2": {
-          "id": "B8sbxjv6j1aGnjyx",
-          "name": "Gmail account"
-        }
-      }
+      "typeVersion": 2.1
     },
     {
       "parameters": {
@@ -122,12 +116,12 @@
         "width": 432,
         "color": 6
       },
-      "id": "bcc9e161-7b76-4de1-8e4a-84f130d4c23b",
+      "id": "f25c14b8-b712-4b5c-8d97-552410aaefc8",
       "name": "Sticky Note6",
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        4512,
-        2096
+        2544,
+        1600
       ],
       "typeVersion": 1
     },
@@ -138,21 +132,15 @@
         "message": "=<div style=\"font-family: 'Arial', sans-serif; max-width: 650px; margin: 0 auto; border: 1px solid #e0e0e0; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.1);\">\n  \n  <!-- Header -->\n  <div style=\"background-color: #667eea; color: white; padding: 40px 30px; text-align: center;\">\n    <h1 style=\"margin: 0; font-size: 28px;\">Thank You!</h1>\n    <p style=\"margin: 5px 0 0; font-size: 16px;\">We've received your inquiry and analyzed your lead details</p>\n  </div>\n\n  <!-- Lead Summary -->\n  <div style=\"background-color: #fff; padding: 30px;\">\n    <p style=\"font-size: 16px;\">Hi <strong>{{ $('Set Fields').item.json.choices[0].message.content.contactName }}</strong>,</p>\n    <p style=\"font-size: 16px;\">Thank you for your interest in <strong>{{ $json.sourceData.dealName }}</strong> at <strong>{{ $json.sourceData.companyName }}</strong>. Our team has reviewed your details and we’re excited to assist you further.</p>\n    \n    <!-- Deal & Lead Info -->\n    <div style=\"background-color: #f5f5f5; padding: 20px; margin: 20px 0; border-radius: 8px;\">\n      <h3 style=\"margin-top: 0; color: #333;\">Lead Summary</h3>\n      <p><strong>Deal Name:</strong> {{ $json.sourceData.dealName }}</p>\n      <p><strong>Company:</strong> {{ $json.sourceData.companyName }}</p>\n      <p><strong>Industry:</strong> {{ $json.sourceData.industry }}</p>\n      <p><strong>Decision Maker:</strong> {{ $json.routingDecision.decisionMakerName }}</p>\n      <p><strong>Lead Score:</strong> {{ $json.leadScore }}</p>\n      <p><strong>Urgency:</strong> {{ $json.bantSummary.timeline.urgency }}</p>\n      <p><strong>Budget Status:</strong> {{ $json.bantSummary.budget.estimatedValue }}</p>\n    </div>\n\n    <!-- Pain Points -->\n    <div style=\"background-color: #ffe6e6; padding: 20px; margin: 20px 0; border-left: 5px solid #ff4d4f; border-radius: 5px;\">\n      <h3 style=\"margin-top: 0; color: #c00;\">Pain Points</h3>\n      <p>{{ $json.mom.painPoints }}</p>\n    </div>\n\n    <!-- Key Insights -->\n    <div style=\"background-color: #e7f3ff; padding: 20px; margin: 20px 0; border-radius: 8px;\">\n      <h3 style=\"margin-top: 0; color: #1a73e8;\">Key Insights</h3>\n      <ul style=\"margin: 10px 0; padding-left: 20px;\">\n        <li>{{ $json.keyInsights[0] }}</li>\n        <li>{{ $json.keyInsights[1] }}</li>\n        <li>{{ $json.keyInsights[2] }}</li>\n        <li>{{ $json.keyInsights[3] }}</li>\n      </ul>\n    </div>\n\n    <!-- Routing Info -->\n    <div style=\"background-color: #fff3e0; padding: 20px; margin: 20px 0; border-left: 5px solid #ff9800; border-radius: 5px;\">\n      <h3 style=\"margin-top: 0; color: #e65100;\">Routing Details</h3>\n      <p><strong>Routed To:</strong> {{ $json.routingDecision.routedTo }} ({{ $json.routingDecision.routedLevel }})</p>\n      <p><strong>Email:</strong> {{ $json.routingDecision.routedToEmail }}</p>\n      <p><strong>Reason:</strong> {{ $json.routingDecision.routingReason }}</p>\n    </div>\n\n    <!-- Closing Note -->\n    <p style=\"font-size: 16px;\">Our dedicated account executive will reach out to you shortly to discuss the next steps and assist with your implementation.</p>\n\n    <!-- Account Executive Card -->\n    <div style=\"background-color: #e7f3ff; padding: 20px; margin: 25px 0; border-radius: 8px;\">\n      <h3 style=\"margin-top: 0; color: #1a73e8;\">Your Account Executive</h3>\n      <p><strong>{{ $json.routingDecision.routedTo }}</strong></p>\n      <p>Email: {{ $json.routingDecision.routedToEmail }}</p>\n    </div>\n\n    <p style=\"font-size: 16px;\">We look forward to speaking with you soon!</p>\n  </div>\n\n  <!-- Footer -->\n  <div style=\"background-color: #667eea; color: white; padding: 20px 30px; text-align: center;\">\n    <p style=\"margin: 0; font-size: 14px;\">© 2026 {{ $json.sourceData.companyName }}. All rights reserved.</p>\n  </div>\n</div>\n",
         "options": {}
       },
-      "id": "d4e419e6-c2e0-47d4-8a22-87656a063ad2",
+      "id": "8ce6fc2d-e52a-4dab-8fc3-1a0c21b62be1",
       "name": "Send Lead Confirmation",
       "type": "n8n-nodes-base.gmail",
       "position": [
-        4672,
-        2400
+        2704,
+        1904
       ],
       "webhookId": "6744212d-d0e8-4b6d-80c4-9c0ebd30e4f3",
-      "typeVersion": 2.1,
-      "credentials": {
-        "gmailOAuth2": {
-          "id": "B8sbxjv6j1aGnjyx",
-          "name": "Gmail account"
-        }
-      }
+      "typeVersion": 2.1
     },
     {
       "parameters": {
@@ -161,12 +149,12 @@
         "width": 468,
         "color": 7
       },
-      "id": "088b14fa-4602-4bca-ab52-26c4ddd76cb8",
+      "id": "20063434-b9ac-4f5d-bc0e-4ba15f84c1f8",
       "name": "Sticky Note7",
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        5056,
-        1776
+        3088,
+        1280
       ],
       "typeVersion": 1
     },
@@ -463,29 +451,23 @@
         },
         "options": {}
       },
-      "id": "9214e17a-f687-44e3-a613-d9fedeb7b306",
+      "id": "8d8320e2-1aba-4b67-80b3-2d19b3bd1ccd",
       "name": "Log to Tracking Sheet",
       "type": "n8n-nodes-base.googleSheets",
       "position": [
-        5232,
-        2080
+        3264,
+        1584
       ],
-      "typeVersion": 4.4,
-      "credentials": {
-        "googleSheetsOAuth2Api": {
-          "id": "Ou6ciRrfN3tE5MZc",
-          "name": "Google Sheets account"
-        }
-      }
+      "typeVersion": 4.4
     },
     {
       "parameters": {},
-      "id": "ab2cd676-fe7f-43ab-8c76-a1445b6c903a",
+      "id": "4d8a54fb-7ed5-437f-b89c-20e814bd93c3",
       "name": "▶️ Click to Start Setup",
       "type": "n8n-nodes-base.manualTrigger",
       "position": [
-        2048,
-        912
+        80,
+        416
       ],
       "typeVersion": 1
     },
@@ -533,12 +515,12 @@
         },
         "options": {}
       },
-      "id": "5fc74790-4770-438f-8cbf-c2362686ee6c",
+      "id": "49af5718-ab64-4055-8ab6-b9beddb166fa",
       "name": "Prepare Interview Agent",
       "type": "n8n-nodes-base.set",
       "position": [
-        2624,
-        912
+        656,
+        416
       ],
       "typeVersion": 3.4
     },
@@ -546,40 +528,14 @@
       "parameters": {
         "jsCode": "// Access global workflow static data\nconst workflowStaticData = $getWorkflowStaticData('global');\n\n// Data from \"Create Agent\" response\nconst agentId = $input.first().json.id;\nconst callLink = $input.first().json.call_link;\n\n// Data from \"Prepare Interview Agent\" (Sales Qualification Agent)\nconst prepareNode = $('Prepare Interview Agent').first().json;\n\n// Static / configured values\nconst email = \"bharathmunakala22@gmail.com\";\n\n// Build embed iframe code dynamically\nconst embed_code = `<iframe\n  src=\"https://app.trugen.ai/embed?agentId=${agentId}\"\n  width=\"100%\"\n  height=\"600\"\n  frameborder=\"0\"\n  allow=\"camera; microphone; autoplay\"\n></iframe>`;\n\n// Persist values globally\nworkflowStaticData.agentId = agentId;\nworkflowStaticData.agentName = prepareNode.agentName;\nworkflowStaticData.callLink = callLink;\nworkflowStaticData.systemPrompt = prepareNode.systemPrompt;\nworkflowStaticData.welcomeMessage = prepareNode.welcomeMessage;\nworkflowStaticData.agentDescription = prepareNode.agentDescription;\nworkflowStaticData.embed_code = embed_code;\nworkflowStaticData.email = email;\n\n// Return structured output\nreturn [\n  {\n    json: {\n      \"Agent ID\": workflowStaticData.agentId,\n      \"Agent Name\": workflowStaticData.agentName,\n      \"Call Link\": workflowStaticData.callLink,\n      \"Embed Code\": workflowStaticData.embed_code,\n      \"Email\": workflowStaticData.email,\n      \"System Prompt\": workflowStaticData.systemPrompt,\n      \"Welcome Message\": workflowStaticData.welcomeMessage,\n      \"Agent Description\": workflowStaticData.agentDescription,\n      \"Saved At\": new Date().toISOString()\n    }\n  }\n];\n"
       },
-      "id": "a4655823-0e7d-4538-9412-e60304e122e4",
+      "id": "db99c0ca-b4d0-45f6-a677-c90e08f6c804",
       "name": "Save Agent Info",
       "type": "n8n-nodes-base.code",
       "position": [
-        3200,
-        912
+        1232,
+        416
       ],
       "typeVersion": 2
-    },
-    {
-      "parameters": {
-        "name": "={{ $json.agentName }}",
-        "system_prompt": "={{ $json.systemPrompt }}",
-        "greeting": "={{ $json.welcomeMessage }}",
-        "email": "bharathmunakala22@gmail.com",
-        "callback_events": [
-          "call_ended"
-        ],
-        "callback_url": "https://pertinacious-speechlessly-lidia.ngrok-free.dev/webhook-test/a5b6faad-8f40-4639-8a10-af4d939c88e3"
-      },
-      "type": "CUSTOM.trugen",
-      "typeVersion": 1,
-      "position": [
-        2896,
-        912
-      ],
-      "id": "4d66a563-0916-4347-a3c5-74bf91565dab",
-      "name": "Create a new agent",
-      "credentials": {
-        "trugenApi": {
-          "id": "eNwFcMuVVlTBEaYL",
-          "name": "Trugen account"
-        }
-      }
     },
     {
       "parameters": {
@@ -664,10 +620,10 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        2944,
-        1744
+        976,
+        1248
       ],
-      "id": "5350936d-50b6-4d85-b8a6-f2b29b67f9f8",
+      "id": "4614df5e-4019-4756-86ad-5b19e604beff",
       "name": "Set Fields"
     },
     {
@@ -691,19 +647,19 @@
           "temperature": 0.1
         }
       },
-      "id": "99bb24be-3be8-43bd-a033-5bb2ab26dc8b",
+      "id": "f118ed72-1bff-46b7-99ff-38dd1e92a124",
       "name": "Analyze Conversation",
       "type": "@n8n/n8n-nodes-langchain.openAi",
       "position": [
-        2608,
-        1744
+        640,
+        1248
       ],
       "typeVersion": 1,
       "alwaysOutputData": true,
       "credentials": {
         "openAiApi": {
-          "id": "mHjcWhupRubJYtTN",
-          "name": "OpenAi account"
+          "id": "MAbG8Acjw4pdMMl2",
+          "name": "OpenAI account"
         }
       }
     },
@@ -728,17 +684,11 @@
       "type": "n8n-nodes-base.hubspot",
       "typeVersion": 2.2,
       "position": [
-        4544,
-        1424
+        2576,
+        928
       ],
-      "id": "7e3967ae-13ef-4b24-abfe-ae4694b57dc0",
-      "name": "Create or update a contact",
-      "credentials": {
-        "hubspotAppToken": {
-          "id": "xBnDBQzAjo0KNO3K",
-          "name": "HubSpot account"
-        }
-      }
+      "id": "e531a27e-967f-4bc9-8798-e72c5e2fcfb3",
+      "name": "Create or update a contact"
     },
     {
       "parameters": {
@@ -754,17 +704,11 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
       "typeVersion": 1.3,
       "position": [
-        3184,
-        2048
+        1216,
+        1552
       ],
-      "id": "1e7e2bac-ab2f-42f2-bc38-fb2b8c97c2c5",
-      "name": "OpenAI Chat Model",
-      "credentials": {
-        "openAiApi": {
-          "id": "mHjcWhupRubJYtTN",
-          "name": "OpenAi account"
-        }
-      }
+      "id": "9cd9f4d6-b1bc-4e1d-baaa-8d81944e471d",
+      "name": "OpenAI Chat Model"
     },
     {
       "parameters": {
@@ -778,10 +722,10 @@
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 3.1,
       "position": [
-        3264,
-        1760
+        1296,
+        1264
       ],
-      "id": "55b9f345-8a4f-4547-b379-ed6e24d687fc",
+      "id": "69fed768-21fc-4912-942a-b14249cbaf81",
       "name": "AI Agent"
     },
     {
@@ -792,10 +736,10 @@
       "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
       "typeVersion": 1.3,
       "position": [
-        3472,
-        2032
+        1504,
+        1536
       ],
-      "id": "6848727b-60aa-4dd4-8229-fde86cd855be",
+      "id": "7d56dae7-ef75-4277-8e94-4bc94b275493",
       "name": "Structured Output Parser"
     },
     {
@@ -1031,30 +975,28 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        3728,
-        1776
+        1760,
+        1280
       ],
-      "id": "d00334e9-71c9-4454-b4c0-6aa5cd9f361e",
+      "id": "cd8010fa-065f-4ae6-bd20-d1d4fb4ba185",
       "name": "Edit Fields"
     },
     {
       "parameters": {
-        "resource": "conversation",
-        "conversation_id": "={{ $json.body.conversation_id }}",
-        "wait_for_completion": true
+        "operation": "getConversation"
       },
       "type": "CUSTOM.trugen",
       "typeVersion": 1,
       "position": [
-        2304,
-        1744
+        336,
+        1248
       ],
-      "id": "45f0e1d3-dfe3-4e61-a55e-db0d56673ba3",
+      "id": "3b64e43c-47ff-492e-ad3c-f777cec0af28",
       "name": "Get conversation details",
       "credentials": {
         "trugenApi": {
-          "id": "eNwFcMuVVlTBEaYL",
-          "name": "Trugen account"
+          "id": "sj48uMTHmLTqMnEs",
+          "name": "TruGen.AI account"
         }
       }
     },
@@ -1067,10 +1009,10 @@
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2.1,
       "position": [
-        2048,
-        1744
+        80,
+        1248
       ],
-      "id": "f5dc4b2c-5501-4526-8edd-d9667a1252f4",
+      "id": "4e37dd22-1738-40fd-a2d1-4ba7a404c01d",
       "name": "Webhook",
       "webhookId": "a5b6faad-8f40-4639-8a10-af4d939c88e3"
     },
@@ -1201,17 +1143,17 @@
         },
         "options": {}
       },
-      "id": "bd1532de-dfd9-4156-b9fa-04cb22252fe4",
+      "id": "e5b8b7e2-1ec6-43e0-80e7-76d03536814d",
       "name": "Save to Google Sheets",
       "type": "n8n-nodes-base.googleSheets",
       "position": [
-        3584,
-        912
+        1616,
+        416
       ],
       "typeVersion": 4.6,
       "credentials": {
         "googleSheetsOAuth2Api": {
-          "id": "Ou6ciRrfN3tE5MZc",
+          "id": "UqgqLsQd0VplpaVH",
           "name": "Google Sheets account"
         }
       }
@@ -1220,12 +1162,12 @@
       "parameters": {
         "jsCode": "// ========== SALES QUALIFICATION AGENT DESCRIPTION ==========\n// This description guides the agent to collect required sales lead\n// information using natural, polite, and adaptive questioning.\n\nconst agentDescription = `\nYou are a Sales Qualification Agent responsible for engaging prospects and\ncollecting essential lead information in a conversational, professional,\nand structured manner.\n\nYour role is STRICTLY information gathering.\nYou must NOT pitch, demo, negotiate, recommend solutions, or provide opinions.\n\n==================================================\nINTERACTION RULES (MANDATORY)\n==================================================\n- Ask ONLY ONE question at a time.\n- Proceed to the NEXT question ONLY after the current question is answered.\n- Do NOT skip any field listed below.\n- Do NOT guess, infer, or autofill any information.\n- If the user does not know an answer, record \"-\" and continue.\n- You may politely rephrase a question ONCE if unclear.\n- Maintain a professional, calm, and helpful tone at all times.\n\n==================================================\nSECTION 1: COMPANY & CONTACT INFORMATION\n==================================================\n\nCompany Name (companyName)\n- \"What is the name of your company?\"\n- \"Could you please tell me your organization’s name?\"\n- \"Which company are you representing today?\"\n\nContact Name (contactName)\n- \"May I know your full name?\"\n- \"Who am I speaking with?\"\n- \"Could you please share your name?\"\n\nEmail Address (email)\n- \"What’s the best email address to reach you?\"\n- \"Where should we send follow-up information?\"\n- \"Could you provide your work email address?\"\n\nPhone Number (phone)\n- \"What phone number should we use if needed?\"\n- \"Is there a contact number we can reach you on?\"\n- \"Could you share your preferred phone number?\"\n\n==================================================\nSECTION 2: COMPANY PROFILE & PERSONA\n==================================================\n\nCompany Size (companySize)\n- \"How many employees does your company currently have?\"\n- \"What’s the approximate size of your team?\"\n- \"Would you say your organization is small, mid-sized, or large?\"\n\nIndustry (industry)\n- \"Which industry do you operate in?\"\n- \"What sector does your business belong to?\"\n- \"Could you tell me about your company’s industry?\"\n\nPersona / Role (persona)\n- \"What is your role in the organization?\"\n- \"How are you involved in this initiative?\"\n\nDecision Authority (decisionAuthority)\n- \"Are you the final decision-maker for this initiative?\"\n- \"Who else is involved in approving or evaluating this?\"\n\n==================================================\nSECTION 3: CURRENT STATE & NEEDS\n==================================================\n\nCurrent Solution (currentSolution)\n- \"What solution are you currently using, if any?\"\n- \"Are you using any existing tools or platforms today?\"\n- \"How are you handling this process right now?\"\n\nPain Points (painPoints)\n- \"What are the main challenges you’re trying to solve?\"\n- \"What problems led you to explore this?\"\n- \"Where are you facing the most difficulty currently?\"\n\n==================================================\nSECTION 4: BUDGET & TIMELINE\n==================================================\n\nBudget Range (budgetRange)\n- \"What budget range are you considering for this initiative?\"\n- \"Do you have a budget allocated for this?\"\n- \"Roughly how much are you planning to invest?\"\n\nTimeline (timeline)\n- \"When are you planning to move forward?\"\n- \"What does your expected timeline look like?\"\n- \"Are you looking to proceed soon or later?\"\n\n==================================================\nCLOSING INSTRUCTIONS\n==================================================\n- After ALL fields are collected, briefly confirm the information.\n- Inform the prospect that the details will be reviewed internally.\n- Do NOT pitch, demo, or discuss pricing.\n- End the conversation politely and professionally.\n\nOnce all details are collected, ensure the data is structured and submitted\nwith a unique submissionId, timestamp, and raw conversation transcript.\n`;\n\n\n// Do not change anything below this line\nreturn [\n  {\n    json: {\n      agentDescription: agentDescription.trim(),\n      timestamp: new Date().toISOString()\n    }\n  }\n];\n"
       },
-      "id": "02ae53e6-e4b7-41bc-9716-fca13a90dd5d",
+      "id": "aaa23066-ed44-484e-b1de-f7763d3f8434",
       "name": "📝 Call Description",
       "type": "n8n-nodes-base.code",
       "position": [
-        2352,
-        912
+        384,
+        416
       ],
       "typeVersion": 2
     },
@@ -1238,11 +1180,11 @@
       },
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        1968,
-        496
+        0,
+        0
       ],
       "typeVersion": 1,
-      "id": "f8743501-ceba-4b0d-9e47-2711e9a1c867",
+      "id": "3289f774-1606-4484-95bd-28ed2bb2959b",
       "name": "Sticky Note"
     },
     {
@@ -1254,11 +1196,11 @@
       },
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        2544,
-        496
+        576,
+        0
       ],
       "typeVersion": 1,
-      "id": "7605cae9-2dfa-4c4c-84b6-7fea979257d4",
+      "id": "bfb4051b-d23f-43eb-93a3-48a744728dde",
       "name": "Sticky Note1"
     },
     {
@@ -1268,12 +1210,12 @@
         "width": 331,
         "color": 2
       },
-      "id": "317567e9-0747-4fa0-83ad-0cc7e041ce62",
+      "id": "8f574fd2-8211-46fe-beb2-b36c75dc2eee",
       "name": "Success!",
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        3104,
-        656
+        1136,
+        160
       ],
       "typeVersion": 1
     },
@@ -1286,11 +1228,11 @@
       },
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        3456,
-        560
+        1488,
+        64
       ],
       "typeVersion": 1,
-      "id": "86996137-6981-4713-9871-cf77e4f34d0d",
+      "id": "0cb0a6f6-5e8b-489a-8e47-e992948214ba",
       "name": "Sticky Note8"
     },
     {
@@ -1302,11 +1244,11 @@
       },
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        1920,
-        1408
+        -48,
+        912
       ],
       "typeVersion": 1,
-      "id": "8491f0db-17dd-414e-939a-eb4e202c649d",
+      "id": "bdd8f140-b984-4798-b122-19c6eaa0333e",
       "name": "Sticky Note9"
     },
     {
@@ -1318,12 +1260,34 @@
       },
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        2544,
-        1408
+        576,
+        912
       ],
       "typeVersion": 1,
-      "id": "e777046a-16ee-4665-98bc-204736b0aa9f",
+      "id": "1e44981d-5242-4a60-b286-3523a4ebfa0f",
       "name": "Sticky Note10"
+    },
+    {
+      "parameters": {
+        "name": "={{ $json.agentName }}",
+        "system_prompt": "={{ $json.systemPrompt }}",
+        "greeting": "={{ $json.welcomeMessage }}",
+        "maxSessionLengthMinutes": 5
+      },
+      "type": "n8n-nodes-trugen.trugen",
+      "typeVersion": 1,
+      "position": [
+        960,
+        416
+      ],
+      "id": "1d81f469-ab07-413f-898e-5de73e0edca4",
+      "name": "TruGen",
+      "credentials": {
+        "trugenApi": {
+          "id": "sj48uMTHmLTqMnEs",
+          "name": "TruGen.AI account"
+        }
+      }
     }
   ],
   "pinData": {},
@@ -1369,18 +1333,7 @@
       "main": [
         [
           {
-            "node": "Create a new agent",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Create a new agent": {
-      "main": [
-        [
-          {
-            "node": "Save Agent Info",
+            "node": "TruGen",
             "type": "main",
             "index": 0
           }
@@ -1496,17 +1449,28 @@
           }
         ]
       ]
+    },
+    "TruGen": {
+      "main": [
+        [
+          {
+            "node": "Save Agent Info",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "active": false,
   "settings": {
     "executionOrder": "v1",
-    "availableInMCP": false
+    "binaryMode": "separate"
   },
-  "versionId": "df3fd53a-de3c-4dbd-9812-5ae78427c854",
+  "versionId": "b393bc4b-3ebf-4903-8479-bb27e5ebfbec",
   "meta": {
-    "instanceId": "e1198f585f1d67aa5daf373ed640b4d6557142b5cb697dfb9b69d31d6dcaab77"
+    "instanceId": "e9bfecf6f60ce1c0fa48f3a6deadb9c96c19e101b224307912424073cbc467be"
   },
-  "id": "nEPmjzxNzjxYyq2v",
+  "id": "R8ddYrf0yfkCVUSO",
   "tags": []
 }

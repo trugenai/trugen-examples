@@ -7,12 +7,12 @@
         "height": 672,
         "width": 544
       },
-      "id": "42ac2221-23ad-46b8-929d-0ea844e9498d",
+      "id": "fcb9bce9-8f31-4613-beee-53168e4832c5",
       "name": "Main Overview Sticky",
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        -720,
-        480
+        -1120,
+        64
       ],
       "typeVersion": 1
     },
@@ -20,23 +20,23 @@
       "parameters": {
         "jsCode": "// ========== PASTE YOUR JOB DESCRIPTION HERE ==========\n// Simply paste your entire job posting between the quotes below\n// Include everything: job title, company name, requirements, etc.\n\nconst jobDescription = `\nProduct Marketing Manager – TruGen.ai\n\nTruGen.ai is redefining human-computer interaction with hyper-realistic, emotionally intelligent digital communication agents that deliver human-like, real-time conversations at scale. Our proprietary AI technology powers next-generation customer support, sales, HR, and training experiences for leading brands worldwide. We are seeking a dynamic Product Marketing Manager to drive the go-to-market strategy and accelerate adoption of our cutting-edge platform.\n\nResponsibilities\nDevelop and execute go-to-market strategies for new and existing TruGen.ai products, with a focus on driving demand, adoption, and customer engagement.\n\nCraft compelling product positioning and messaging that differentiates our conversational agents and platform in the market.\n\nConduct market, competitor, and user research to identify trends, customer needs, and growth opportunities.\n\nBuild and maintain detailed buyer personas to guide targeted marketing and sales initiatives.\n\nCollaborate closely with product, engineering, and sales teams to align on product vision, roadmap, and feature launches.\n\nLead cross-functional product launches, including launch planning, sales enablement, and campaign execution.\n\nCreate and manage marketing collateral, demos, website content, case studies, and sales tools that clearly communicate product value.\n\nGather and analyze customer feedback and campaign performance data to optimize messaging and marketing programs.\n\nSupport the sales team with training, product presentations, and competitive insights to drive conversions and upsells.\n\nRepresent TruGen.ai at industry events, webinars, and customer meetings as a product evangelist.\n\nRequirements\n4+ years of experience in product marketing, preferably in B2B SaaS, AI, or related technology sectors.\n\nProven track record of launching and scaling innovative technology products, ideally in AI, conversational platforms, or digital agents.\n\nDeep understanding of go-to-market strategies, product positioning, and value-based messaging.\n\nExceptional written and verbal communication skills, including copywriting and storytelling.\n\nStrong analytical skills with experience in market research, data analysis, and campaign optimization.\n\nDemonstrated ability to influence and collaborate with cross-functional teams without direct authority.\n\nExperience supporting sales teams with enablement materials and training.\n\nBachelor’s degree in marketing, business, or a related field; advanced degree a plus.\n\nPassion for emerging technologies, AI, and shaping the future of human-computer interaction.\n\nWhy TruGen.ai?\nJoin a visionary, fast-growing team with deep expertise in AI and conversational agent technology.\n\nShape the future of digital communication and help global brands deliver human-like experiences at scale.\n\nWork with a collaborative, mission-driven team backed by proven founders and industry leaders.\n\nCompetitive compensation, flexible work environment, and opportunities for rapid career growth.\n\nReady to help define the future of human-AI interaction? Apply now and join TruGen.ai!\n`;\n\n// Don't change anything below this line\nreturn [{\n  json: {\n    jobDescription: jobDescription.trim(),\n    timestamp: new Date().toISOString()\n  }\n}];\n"
       },
-      "id": "2adede86-65f2-44ca-8bea-4028a09f416d",
+      "id": "eefba234-49c4-4338-bc7f-45e75383fa62",
       "name": "📝 Your Job Description",
       "type": "n8n-nodes-base.code",
       "position": [
-        736,
-        496
+        336,
+        80
       ],
       "typeVersion": 2
     },
     {
       "parameters": {},
-      "id": "ec58bb4c-30c1-4da8-8ca9-1bd74b96b0cf",
+      "id": "69e068c3-80f3-4b2c-83f7-1ee32836a41e",
       "name": "▶️ Click to Start Setup",
       "type": "n8n-nodes-base.manualTrigger",
       "position": [
-        512,
-        496
+        112,
+        80
       ],
       "typeVersion": 1
     },
@@ -78,12 +78,12 @@
         },
         "options": {}
       },
-      "id": "ded63a99-8f26-453b-87af-a3036b29e6ee",
+      "id": "5ad060e1-ecaa-47d3-91a6-966f7a9f124e",
       "name": "Prepare Interview Agent",
       "type": "n8n-nodes-base.set",
       "position": [
-        992,
-        496
+        592,
+        80
       ],
       "typeVersion": 3.4
     },
@@ -91,12 +91,12 @@
       "parameters": {
         "jsCode": "const workflowStaticData = $getWorkflowStaticData('global');\n\n\n\nconst agentId = $input.first().json.id;\nconst interviewLink = $input.first().json.call_link;\nconst jobDescription = $('Prepare Interview Agent').first().json.jobDescription;\n\nworkflowStaticData.agentId = agentId;\nworkflowStaticData.jobDescription = jobDescription;\nworkflowStaticData.interviewLink = interviewLink;\n\n\n\nreturn [{\n  json: {\n    \"Agent ID\": workflowStaticData.agentId,\n    \"Agent Name\":$('Prepare Interview Agent').first().json.agentName,\n    \"Interview Link\": interviewLink,\n    \"Job Description\": workflowStaticData.jobDescription,\n    \"System Prompt\": $('Prepare Interview Agent').first().json.systemPrompt,\n    \"Welcome Message\": $('Prepare Interview Agent').first().json.welcomeMessage\n    \n  }\n}];"
       },
-      "id": "0da13ad0-3931-4fc9-9880-15fb65ae3d3f",
+      "id": "527fe0b6-5081-4210-8e34-fd7ca5501762",
       "name": "Save Agent Info",
       "type": "n8n-nodes-base.code",
       "position": [
-        1520,
-        496
+        1120,
+        80
       ],
       "typeVersion": 2
     },
@@ -105,17 +105,17 @@
         "operation": "append",
         "documentId": {
           "__rl": true,
-          "value": "1_hqZsoN92-F7teX5sBkvb-BJ8U_6jTsJP90hOQKUE4c",
+          "value": "1nF0fW0HLMqCAgH0O9CcmCkH6_eKOFTi8sQxHG6hFecs",
           "mode": "list",
-          "cachedResultName": "n8n",
-          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1_hqZsoN92-F7teX5sBkvb-BJ8U_6jTsJP90hOQKUE4c/edit?usp=drivesdk"
+          "cachedResultName": "n8n sid",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1nF0fW0HLMqCAgH0O9CcmCkH6_eKOFTi8sQxHG6hFecs/edit?usp=drivesdk"
         },
         "sheetName": {
           "__rl": true,
           "value": 1130239116,
           "mode": "list",
           "cachedResultName": "Interview Agents",
-          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1_hqZsoN92-F7teX5sBkvb-BJ8U_6jTsJP90hOQKUE4c/edit#gid=1130239116"
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1nF0fW0HLMqCAgH0O9CcmCkH6_eKOFTi8sQxHG6hFecs/edit#gid=1130239116"
         },
         "columns": {
           "mappingMode": "defineBelow",
@@ -189,44 +189,18 @@
         },
         "options": {}
       },
-      "id": "1df0ef79-1e3e-44da-b3a1-4b4aed333486",
+      "id": "bd640ee0-379e-4974-a825-b0eb66b80f8e",
       "name": "Save to Google Sheets1",
       "type": "n8n-nodes-base.googleSheets",
       "position": [
-        1920,
-        496
+        1520,
+        80
       ],
       "typeVersion": 4.6,
       "credentials": {
         "googleSheetsOAuth2Api": {
-          "id": "Ou6ciRrfN3tE5MZc",
+          "id": "UqgqLsQd0VplpaVH",
           "name": "Google Sheets account"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "name": "={{ $json.agentName }}",
-        "system_prompt": "={{ $json.systemPrompt }}",
-        "greeting": "={{ $json.welcomeMessage }}",
-        "email": "reddybharath7131@gmail.com",
-        "callback_events": [
-          "call_ended"
-        ],
-        "callback_url": "https://pertinacious-speechlessly-lidia.ngrok-free.dev/webhook-test/a5b6faad-8f40-4639-8a10-af4d939c88e3"
-      },
-      "type": "CUSTOM.trugen",
-      "typeVersion": 1,
-      "position": [
-        1216,
-        496
-      ],
-      "id": "32e632d4-97bb-455b-9f9f-76afb4a2d73a",
-      "name": "Create a new agent",
-      "credentials": {
-        "trugenApi": {
-          "id": "eNwFcMuVVlTBEaYL",
-          "name": "Trugen account"
         }
       }
     },
@@ -249,19 +223,19 @@
           "temperature": 0.3
         }
       },
-      "id": "d573b8f2-5a4d-4976-8252-08028c5c8088",
+      "id": "5fa0c4ea-be14-4def-9bed-8ddffff45313",
       "name": "Analyze Interview",
       "type": "@n8n/n8n-nodes-langchain.openAi",
       "position": [
-        1248,
-        1376
+        848,
+        960
       ],
       "typeVersion": 1,
       "alwaysOutputData": true,
       "credentials": {
         "openAiApi": {
-          "id": "mHjcWhupRubJYtTN",
-          "name": "OpenAi account"
+          "id": "MAbG8Acjw4pdMMl2",
+          "name": "OpenAI account"
         }
       }
     },
@@ -269,12 +243,12 @@
       "parameters": {
         "jsCode": "// ===============================\n// Parse AI analysis output\n// ===============================\nconst aiOutput = $input.first().json.message.content;\n\n// Convert from string to JSON\nlet analysis;\ntry {\n  analysis = JSON.parse(aiOutput);\n} catch (err) {\n  throw new Error('Failed to parse LLM output: ' + err.message);\n}\n\n// ===============================\n// Extract metadata from the AI output itself\n// ===============================\nconst candidateName = analysis.candidateName || 'Unknown';\nconst candidateId = analysis.candidateId || 'N/A';\nconst conversationId = analysis.conversationId || $json.conversation_id || $json.id || 'N/A';\nconst callLink = $json.call_link || 'N/A';\nconst interviewDate = $now.toFormat('dd.MM.yyyy');\nconst duration = $json.duration_minutes || 'N/A';\n\n// ===============================\n// Format output for Google Sheets\n// ===============================\nreturn [{\n  json: {\n    \"Candidate Name\": candidateName,\n    \"Candidate ID\": candidateId,\n    \"Conversation ID\": conversationId,\n    \"Interview Date\": interviewDate,\n    \"Duration (minutes)\": duration,\n    \"Fit Score\": analysis.fitScore || '',\n    \"Recommendation\": analysis.recommendation || '',\n    \"Strengths\": analysis.strengths?.join(\"; \") || '',\n    \"Concerns\": analysis.concerns?.join(\"; \") || '',\n    \"Summary\": analysis.summary || '',\n    \"Next Steps\": analysis.nextSteps?.join(\"; \") || '',\n    \"Call ID\": callLink,\n    \"Analyzed On\": $now.toISO(),\n  }\n}];\n"
       },
-      "id": "0e030117-9478-45a7-a8be-be9d26c25823",
+      "id": "8a630553-ff05-424d-8831-27d3db5b0bd1",
       "name": "Format for Sheets",
       "type": "n8n-nodes-base.code",
       "position": [
-        1840,
-        1376
+        1440,
+        960
       ],
       "typeVersion": 2,
       "alwaysOutputData": true
@@ -284,33 +258,30 @@
         "operation": "append",
         "documentId": {
           "__rl": true,
-          "value": "1_hqZsoN92-F7teX5sBkvb-BJ8U_6jTsJP90hOQKUE4c",
+          "value": "1nF0fW0HLMqCAgH0O9CcmCkH6_eKOFTi8sQxHG6hFecs",
           "mode": "list",
-          "cachedResultName": "n8n",
-          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1_hqZsoN92-F7teX5sBkvb-BJ8U_6jTsJP90hOQKUE4c/edit?usp=drivesdk"
+          "cachedResultName": "n8n sid",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1nF0fW0HLMqCAgH0O9CcmCkH6_eKOFTi8sQxHG6hFecs/edit?usp=drivesdk"
         },
         "sheetName": {
           "__rl": true,
           "value": 1941360756,
           "mode": "list",
           "cachedResultName": "Interview Results",
-          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1_hqZsoN92-F7teX5sBkvb-BJ8U_6jTsJP90hOQKUE4c/edit#gid=1941360756"
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1nF0fW0HLMqCAgH0O9CcmCkH6_eKOFTi8sQxHG6hFecs/edit#gid=1941360756"
         },
         "columns": {
           "mappingMode": "defineBelow",
           "value": {
             "Candidate Name": "={{ $json['Candidate Name'] }}",
             "Interview Date": "={{ $json['Interview Date'] }}",
-            "Duration (minutes)": "={{ $json['Duration (minutes)'] }}",
             "Fit Score": "={{ $json['Fit Score'] }}",
             "Recommendation": "={{ $json.Recommendation }}",
             "Strengths": "={{ $json.Strengths }}",
             "Concerns": "={{ $json.Concerns }}",
             "Summary": "={{ $json.Summary }}",
             "Next Steps": "={{ $json['Next Steps'] }}",
-            "Call ID": "={{ $json['Call ID'] }}",
-            "Analyzed On": "={{ $json['Analyzed On'] }}",
-            "Duration": "={{ $json['Duration (minutes)'] }}"
+            "Analyzed On": "={{ $json['Analyzed On'] }}"
           },
           "matchingColumns": [],
           "schema": [
@@ -326,15 +297,6 @@
             {
               "id": "Interview Date",
               "displayName": "Interview Date",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "string",
-              "canBeUsedToMatch": true
-            },
-            {
-              "id": "Duration (minutes)",
-              "displayName": "Duration (minutes)",
               "required": false,
               "defaultMatch": false,
               "display": true,
@@ -396,26 +358,8 @@
               "canBeUsedToMatch": true
             },
             {
-              "id": "Call ID",
-              "displayName": "Call ID",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "string",
-              "canBeUsedToMatch": true
-            },
-            {
               "id": "Analyzed On",
               "displayName": "Analyzed On",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "string",
-              "canBeUsedToMatch": true
-            },
-            {
-              "id": "Duration",
-              "displayName": "Duration",
               "required": false,
               "defaultMatch": false,
               "display": true,
@@ -428,17 +372,17 @@
         },
         "options": {}
       },
-      "id": "e98f53f0-1913-4820-bfb1-b1697fdeee49",
+      "id": "550fc48b-395d-4687-a66f-2dadfd4c4d67",
       "name": "Save to Google Sheets",
       "type": "n8n-nodes-base.googleSheets",
       "position": [
-        2096,
-        1376
+        1696,
+        960
       ],
       "typeVersion": 4.6,
       "credentials": {
         "googleSheetsOAuth2Api": {
-          "id": "Ou6ciRrfN3tE5MZc",
+          "id": "UqgqLsQd0VplpaVH",
           "name": "Google Sheets account"
         }
       }
@@ -447,38 +391,19 @@
       "parameters": {
         "httpMethod": "POST",
         "path": "a5b6faad-8f40-4639-8a10-af4d939c88e3",
+        "responseMode": "lastNode",
+        "responseData": "allEntries",
         "options": {}
       },
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2.1,
       "position": [
-        576,
-        1376
+        176,
+        960
       ],
-      "id": "79a6bc42-2481-491a-88bd-1ee9f69d46bd",
+      "id": "881ea4f6-07e2-4e9f-91fd-434835bb0e59",
       "name": "Webhook",
       "webhookId": "a5b6faad-8f40-4639-8a10-af4d939c88e3"
-    },
-    {
-      "parameters": {
-        "resource": "conversation",
-        "conversation_id": "={{ $json.body.conversation_id }}",
-        "wait_for_completion": true
-      },
-      "type": "CUSTOM.trugen",
-      "typeVersion": 1,
-      "position": [
-        816,
-        1376
-      ],
-      "id": "00f4d10f-230c-4497-8192-73648fa87045",
-      "name": "Get conversation details",
-      "credentials": {
-        "trugenApi": {
-          "id": "eNwFcMuVVlTBEaYL",
-          "name": "Trugen account"
-        }
-      }
     },
     {
       "parameters": {
@@ -487,12 +412,12 @@
         "width": 432,
         "color": 5
       },
-      "id": "5b5a65e0-5357-49da-87c6-9baa84e427cd",
+      "id": "b335ae39-5ea7-4160-a85e-a55e694720d2",
       "name": "Job Description Instructions",
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        464,
-        144
+        64,
+        -272
       ],
       "typeVersion": 1
     },
@@ -503,12 +428,12 @@
         "width": 478,
         "color": 7
       },
-      "id": "1e711111-b960-4ec4-83b3-ac7b1dacc4f9",
+      "id": "f2faf5fe-1349-494b-b60d-8238a394df2d",
       "name": "Setup Instructions",
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        912,
-        240
+        512,
+        -176
       ],
       "typeVersion": 1
     },
@@ -519,12 +444,12 @@
         "width": 331,
         "color": 2
       },
-      "id": "7a5cbd7f-d32d-4677-b8a4-0949d4ee9318",
+      "id": "513eb880-d886-4c0d-8907-f8ff98d3ce62",
       "name": "Success!",
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        1408,
-        256
+        1008,
+        -160
       ],
       "typeVersion": 1
     },
@@ -535,12 +460,12 @@
         "width": 444,
         "color": 6
       },
-      "id": "69c4567b-0d69-4166-9922-6d3401c105d3",
+      "id": "fec1100a-3d07-43a2-a89a-5285f8927856",
       "name": "Sheet Headers",
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        1776,
-        144
+        1360,
+        -208
       ],
       "typeVersion": 1
     },
@@ -551,12 +476,12 @@
         "width": 488,
         "color": 6
       },
-      "id": "479ae1fe-9240-4b40-8ac3-026bd1667309",
+      "id": "7353ef50-b7de-404a-8e9d-a35f7eaaa536",
       "name": "Automated Analysis",
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        496,
-        1088
+        112,
+        688
       ],
       "typeVersion": 1
     },
@@ -567,12 +492,12 @@
         "width": 684,
         "color": 4
       },
-      "id": "29d88bf2-a02b-4a2c-97cd-42da95533942",
+      "id": "a3116100-b91d-4b58-9d1f-f9b40be41770",
       "name": "Processing Steps",
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        1024,
-        720
+        624,
+        304
       ],
       "typeVersion": 1
     },
@@ -583,12 +508,12 @@
         "width": 480,
         "color": 6
       },
-      "id": "1cfb84f7-088a-4aad-8f33-444123e32068",
+      "id": "c6bd2441-d3c0-450a-afc2-a4553e4ced00",
       "name": "Sheet Headers1",
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        1776,
-        1168
+        1376,
+        752
       ],
       "typeVersion": 1
     },
@@ -599,12 +524,12 @@
         "width": 516,
         "color": 3
       },
-      "id": "e6e2d6ac-812d-41ba-87ad-5e5403b9f58a",
+      "id": "43352c50-b4a3-48ce-a121-ab6334fd3e1c",
       "name": "Important!",
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        -112,
-        384
+        -512,
+        -32
       ],
       "typeVersion": 1
     },
@@ -615,12 +540,12 @@
         "width": 352,
         "color": 7
       },
-      "id": "cfd6b3c1-ecf2-4459-8370-5bc87a747f64",
+      "id": "977097c8-cfbd-4760-bd6e-cce9e6ec908f",
       "name": "Sticky Note",
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        -16,
-        256
+        -416,
+        -160
       ],
       "typeVersion": 1
     },
@@ -631,14 +556,59 @@
         "width": 384,
         "color": 7
       },
-      "id": "69e977e0-0c81-417c-957e-64ed03b476cc",
+      "id": "69b64a9b-da3f-433e-b480-81026123ec1e",
       "name": "Sticky Note1",
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        -32,
-        1376
+        -432,
+        960
       ],
       "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "name": "={{ $json.agentName }}",
+        "system_prompt": "={{ $json.systemPrompt }}",
+        "greeting": "={{ $json.welcomeMessage }}",
+        "maxSessionLengthMinutes": 5,
+        "callback_events": [
+          "call_ended"
+        ],
+        "callback_url": "https://nailless-ungrainable-therese.ngrok-free.dev/webhook-test/a5b6faad-8f40-4639-8a10-af4d939c88e3"
+      },
+      "type": "n8n-nodes-trugen.trugen",
+      "typeVersion": 1,
+      "position": [
+        832,
+        80
+      ],
+      "id": "a1351ae3-1c4f-4771-bc25-c6ac9a60acc5",
+      "name": "TruGen",
+      "credentials": {
+        "trugenApi": {
+          "id": "sj48uMTHmLTqMnEs",
+          "name": "TruGen.AI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getConversation"
+      },
+      "type": "n8n-nodes-trugen.trugen",
+      "typeVersion": 1,
+      "position": [
+        416,
+        960
+      ],
+      "id": "243115dc-81a1-48ea-9872-4b7c0b4bb3f7",
+      "name": "TruGen1",
+      "credentials": {
+        "trugenApi": {
+          "id": "sj48uMTHmLTqMnEs",
+          "name": "TruGen.AI account"
+        }
+      }
     }
   ],
   "pinData": {},
@@ -702,18 +672,7 @@
       "main": [
         [
           {
-            "node": "Create a new agent",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Create a new agent": {
-      "main": [
-        [
-          {
-            "node": "Save Agent Info",
+            "node": "TruGen",
             "type": "main",
             "index": 0
           }
@@ -724,14 +683,25 @@
       "main": [
         [
           {
-            "node": "Get conversation details",
+            "node": "TruGen1",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Get conversation details": {
+    "TruGen": {
+      "main": [
+        [
+          {
+            "node": "Save Agent Info",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TruGen1": {
       "main": [
         [
           {
@@ -746,12 +716,13 @@
   "active": false,
   "settings": {
     "executionOrder": "v1",
-    "availableInMCP": false
+    "binaryMode": "separate"
   },
-  "versionId": "dbc20e81-ec46-42be-a33f-9667474d8963",
+  "versionId": "475ba5ea-1658-429e-9fe3-b78a12915ddd",
   "meta": {
-    "instanceId": "e1198f585f1d67aa5daf373ed640b4d6557142b5cb697dfb9b69d31d6dcaab77"
+    "templateCredsSetupCompleted": true,
+    "instanceId": "e9bfecf6f60ce1c0fa48f3a6deadb9c96c19e101b224307912424073cbc467be"
   },
-  "id": "9628WsEx98oO5VWS",
+  "id": "CxWyZoQ2r8Tdufg0",
   "tags": []
 }

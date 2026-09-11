@@ -20,6 +20,7 @@ Each example directory includes its own README file with setup and usage instruc
 ### Video to Video Agents
 
 - [`livekit-plugin`](voice-to-video/livekit): Give face to your existing Livekit Voice agent with a simple line of code.
+- [`livekit-hawkeye-interview`](voice-to-video/livekit-hawkeye-interview): AI Engineer interview voice agent with a Huma-2 avatar face and Hawkeye-1 vision monitoring that warns candidates when they look away from the camera.
 
 ### Embed via Widget
 

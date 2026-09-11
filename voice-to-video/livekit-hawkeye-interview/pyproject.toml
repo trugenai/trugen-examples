@@ -1,0 +1,11 @@
+[project]
+name = "livekit-hawkeye-interview"
+version = "0.1.0"
+description = "AI Engineer interview agent with a TruGen avatar (Huma-2) and Hawkeye-1 focus monitoring"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "livekit-agents[trugen]~=1.5",
+    "httpx>=0.27",
+    "python-dotenv>=1.0",
+]
